@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>フロント台帳</title>
+  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- PWA: manifest -->
+  <link rel="manifest" href="/manifest.webmanifest" />
+
+  <!-- PWA: テーマ色（Androidのアドレスバーの色など） -->
+  <meta name="theme-color" content="#0d47a1" />
+
+  <!-- iOS / iPadOS PWA: ホーム画面用タイトル -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="My PWA App" />
+
+  <!-- iOS / iPadOS PWA: アイコン（サイズ違いを複数用意するとベター） -->
+  <link rel="apple-touch-icon" href="/icons/apple-icon-180.png" />
+  <!-- 余裕があればこんな感じで -->
+  <!-- <link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-icon-120.png" /> -->
+  <!-- <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-icon-152.png" /> -->
+
+  <!-- favicon（ついでに）-->
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+  <!-- 互換性重視なら -->
+  <!-- <link rel="shortcut icon" href="/favicon.ico" /> -->
+   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+
+</head>
+<body>
+
+  <header>
+    <div class="header-left" id="todayHeader"></div>
+    <div class="header-right">
+      <button type="submit" formtarget="_blank" formaction="https://docs.google.com/spreadsheets/d/179xwXMPpkSZ7GRqLGRhCmFPXvXHWARCUz23qQCCZC6k/edit?" class="headbtn">スプレッドシート</button>
+      <button id="loadButton" class="headbtn">再読込</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="status"></div>
+    <div id="tableContainer" class="table-container"></div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js").catch((err) => {
+        console.error("SW registration failed:", err);
+      });
+    });
+  }
+</script>
+
+</body>
+</html>

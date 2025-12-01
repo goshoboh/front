@@ -1,0 +1,138 @@
+* { box-sizing: border-box; }
+
+body {
+  font-family: system-ui;
+  margin: 0;
+  background: #f5f5f5;
+}
+
+header {
+  background: #1976d2;
+  color: #fff;
+  padding: 0.4rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#dateInput{
+  font-size: 1.5rem;
+  border-radius: 4px;
+  border: none;
+  padding: 4px;
+}
+
+.daybtn{
+  border: none;
+  color: white;
+  background-color: #1976d2;
+  font-size: 1.4rem;
+}
+
+.header-right{
+  height: 100%;
+}
+
+.headbtn {
+  height: 100%;
+  border: none;
+  padding: 5px;
+  margin-left: 4px;
+  font-size: 1rem;
+  background: #fff;
+  color: #1976d2;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#status {
+  margin: 1rem;
+  font-size: 0.9rem;
+}
+
+.table-container {
+  margin: 0;
+  background: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 600px;
+}
+
+th {
+  font-size: 0.8rem;
+  border: 1px solid #ddd;
+  background: #eee;
+}
+
+td {
+  border-bottom: 1px solid #bbb;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  padding: 4px 0.6rem;
+  font-size: 0.85rem;
+}
+
+table th:nth-child(1),
+table td:nth-child(1) {
+  min-width: 40px;
+}
+
+/* 夕食列 */
+table th:nth-child(11),
+table td:nth-child(11) {
+  min-width: 53px;
+}
+
+table th:nth-child(12),
+table td:nth-child(12) {
+  min-width: 40px;
+}
+
+/* ピッカーウィンドウ全般 */
+.pickwindow {
+  border: rgb(0, 0, 0) solid 2px;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.4);
+  margin: 10px;
+}
+
+
+/* カラーピッカー */
+.color-picker {
+  position: absolute;
+  display: none;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  z-index: 9999;
+}
+
+.color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.color-swatch.transparent {
+  background: repeating-linear-gradient(
+    45deg,
+    #f5f5f5,
+    #f5f5f5 4px,
+    #ddd 4px,
+    #ddd 8px
+  );
+}
+
+td.no-cell {
+  cursor: pointer;
+}
