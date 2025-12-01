@@ -39,7 +39,13 @@
   <header>
     <div class="header-left" id="todayHeader"></div>
     <div class="header-right">
-      <button type="submit" formtarget="_blank" formmethod="get" formaction="https://docs.google.com/spreadsheets/d/179xwXMPpkSZ7GRqLGRhCmFPXvXHWARCUz23qQCCZC6k/edit" class="headbtn">スプレッドシート</button>
+      <form
+        action="https://docs.google.com/spreadsheets/d/179xwXMPpkSZ7GRqLGRhCmFPXvXHWARCUz23qQCCZC6k/edit"
+        target="_blank">
+        <button type="submit" class="headbtn">
+          スプレッドシート
+        </button>
+      </form>
       <button id="loadButton" class="headbtn">再読込</button>
     </div>
   </header>
@@ -62,4 +68,5 @@
 
 </body>
 </html>
+
 
