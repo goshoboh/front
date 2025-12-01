@@ -31,6 +31,247 @@ function loadForCurrentDate() {
   fetchAndRender(currentSheetId);
 }
 
+// ==== 部屋移動モーダル用 ====
+let roomMoveModalEl = null;
+let roomMoveTableBodyEl = null;
+let roomMoveExecButton = null;
+let roomMoveStatusEl = null;
+let roomMoveSelectedRows = []; // シートの行番号（1始まり）を入れる
+document.getElementById('roomMoveButton').addEventListener('click' , () => {
+  openRoomMoveModal();
+});
+
+function initRoomMoveModal() {
+  if (roomMoveModalEl) return;
+
+  // オーバーレイ
+  roomMoveModalEl = document.createElement('div');
+  roomMoveModalEl.id = 'roomMoveModal';
+  roomMoveModalEl.style.position = 'fixed';
+  roomMoveModalEl.style.inset = '0';
+  roomMoveModalEl.style.background = 'rgba(0,0,0,0.4)';
+  roomMoveModalEl.style.display = 'none';
+  roomMoveModalEl.style.zIndex = '9999';
+  roomMoveModalEl.style.alignItems = 'center';
+  roomMoveModalEl.style.justifyContent = 'center';
+
+  // コンテンツ
+  const content = document.createElement('div');
+  content.style.background = '#fff';
+  content.style.borderRadius = '8px';
+  content.style.padding = '30px';
+  content.style.minWidth = '320px';
+  content.style.maxHeight = '80vh';
+  content.style.display = 'flex';
+  content.style.flexDirection = 'column';
+  content.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+
+  const title = document.createElement('div');
+  title.textContent = '部屋移動';
+  title.style.fontWeight = 'bold';
+  title.style.fontSize = '1.4rem';
+  title.style.marginBottom = '8px';
+  content.appendChild(title);
+
+  const desc = document.createElement('div');
+  desc.textContent = '入れ替えたい部屋を2つ選択してください。';
+  desc.style.fontSize = '0.85rem';
+  desc.style.marginBottom = '8px';
+  content.appendChild(desc);
+
+  // 簡易テーブル（No & 氏名）
+  const tableWrapper = document.createElement('div');
+  tableWrapper.style.flex = '1';
+  tableWrapper.style.overflowY = 'auto';
+  tableWrapper.style.marginBottom = '8px';
+
+  const table = document.createElement('table');
+  table.style.width = '100%';
+  table.style.minWidth = '400px';
+  table.style.borderCollapse = 'collapse';
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th style="border-bottom:1px solid #ccc; padding:4px;">No</th>
+        <th style="border-bottom:1px solid #ccc; padding:4px;">氏名</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  `;
+
+  roomMoveTableBodyEl = table.querySelector('tbody');
+  tableWrapper.appendChild(table);
+  content.appendChild(tableWrapper);
+
+  // ステータス表示
+  roomMoveStatusEl = document.createElement('div');
+  roomMoveStatusEl.style.minHeight = '1.2em';
+  roomMoveStatusEl.style.fontSize = '0.85rem';
+  roomMoveStatusEl.style.marginBottom = '8px';
+  content.appendChild(roomMoveStatusEl);
+
+  // ボタン行
+  const buttonRow = document.createElement('div');
+  buttonRow.style.display = 'flex';
+  buttonRow.style.flexDirection = 'column';
+  buttonRow.style.gap = '10px';
+
+  
+  roomMoveExecButton = document.createElement('button');
+  roomMoveExecButton.textContent = '部屋移動を実行';
+  roomMoveExecButton.disabled = true;
+  roomMoveExecButton.className = 'movebtn';
+  roomMoveExecButton.addEventListener('click', () => {
+    executeRoomMove();
+  });
+
+
+  buttonRow.appendChild(roomMoveExecButton);
+  content.appendChild(buttonRow);
+
+  roomMoveModalEl.appendChild(content);
+  document.body.appendChild(roomMoveModalEl);
+
+  // オーバーレイクリックで閉じる（中身クリックは閉じない）
+  roomMoveModalEl.addEventListener('click', (e) => {
+    if (e.target === roomMoveModalEl) {
+      closeRoomMoveModal();
+    }
+  });
+}
+function openRoomMoveModal() {
+  initRoomMoveModal();
+
+  // 今表示中のメインテーブルから、No & 氏名 & 行番号を取得
+  const mainTable = tableContainer.querySelector('table');
+  if (!mainTable) {
+    alert('テーブルが読み込まれていません。');
+    return;
+  }
+  const mainTbody = mainTable.querySelector('tbody');
+  if (!mainTbody) {
+    alert('テーブルが読み込まれていません。');
+    return;
+  }
+
+  roomMoveTableBodyEl.innerHTML = '';
+  roomMoveSelectedRows = [];
+  roomMoveStatusEl.textContent = '';
+  roomMoveExecButton.disabled = true;
+
+  const trs = Array.from(mainTbody.querySelectorAll('tr'));
+
+  trs.forEach(tr => {
+    const tds = tr.querySelectorAll('td');
+    if (tds.length < 3) return;
+
+    const noText = tds[1].textContent || '';
+    const nameText = tds[2].textContent || '';
+
+    // No or 氏名セルに埋め込んでいる data-row-index からシート行番号を取得
+    let rowIndex = null;
+    for (const td of tds) {
+      const idxStr = td.dataset && td.dataset.rowIndex;
+      if (idxStr) {
+        rowIndex = parseInt(idxStr, 10);
+        break;
+      }
+    }
+    if (!rowIndex) return;
+
+    const modalTr = document.createElement('tr');
+    modalTr.dataset.rowIndex = String(rowIndex);
+
+    const tdNo = document.createElement('td');
+    tdNo.textContent = noText;
+    tdNo.style.padding = '4px';
+    tdNo.style.borderBottom = '1px solid #eee';
+
+    const tdName = document.createElement('td');
+    tdName.textContent = nameText;
+    tdName.style.padding = '4px';
+    tdName.style.borderBottom = '1px solid #eee';
+
+    modalTr.appendChild(tdNo);
+    modalTr.appendChild(tdName);
+
+    modalTr.addEventListener('click', () => {
+      toggleRoomMoveRowSelection(modalTr);
+    });
+
+    roomMoveTableBodyEl.appendChild(modalTr);
+  });
+
+  roomMoveModalEl.style.display = 'flex';
+}
+
+function toggleRoomMoveRowSelection(tr) {
+  const rowIndex = parseInt(tr.dataset.rowIndex, 10);
+  if (!rowIndex) return;
+
+  const selectedIdx = roomMoveSelectedRows.indexOf(rowIndex);
+
+  if (selectedIdx >= 0) {
+    // 選択解除
+    roomMoveSelectedRows.splice(selectedIdx, 1);
+    tr.classList.remove('selected');
+  } else {
+    // 2行までしか選択させない
+    if (roomMoveSelectedRows.length >= 2) {
+      return; // 3行目以降の選択は無視
+    }
+    roomMoveSelectedRows.push(rowIndex);
+    tr.classList.add('selected');
+  }
+
+  // ちょうど2行のときだけ実行ボタンを有効化
+  roomMoveExecButton.disabled = roomMoveSelectedRows.length !== 2;
+}
+
+function closeRoomMoveModal() {
+  if (!roomMoveModalEl) return;
+  roomMoveModalEl.style.display = 'none';
+}
+
+async function executeRoomMove() {
+  if (roomMoveSelectedRows.length !== 2) return;
+
+  const [row1, row2] = roomMoveSelectedRows;
+  roomMoveExecButton.disabled = true;
+  roomMoveStatusEl.textContent = '部屋移動中...';
+
+  try {
+    const res = await fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'swapRows',
+        date: currentSheetId,
+        authKey: authKey,
+        row1: row1,
+        row2: row2
+      })
+    });
+
+    const json = await res.json();
+    if (!json.success) {
+      roomMoveStatusEl.textContent = json.message || '部屋移動に失敗しました';
+      roomMoveExecButton.disabled = false;
+      return;
+    }
+
+    // 成功
+    closeRoomMoveModal();
+    // 再読み込み
+    loadForCurrentDate();
+
+  } catch (e) {
+    console.error(e);
+    roomMoveStatusEl.textContent = 'エラー: ' + e.message;
+    roomMoveExecButton.disabled = false;
+  }
+}
+
 
 
 
@@ -373,7 +614,7 @@ function initDinnerPicker() {
   dinnerPickerEl.style.position = 'absolute';
   dinnerPickerEl.style.display = 'none';
   dinnerPickerEl.style.background = '#fff';
-  dinnerPickerEl.style.padding = '6px';
+  dinnerPickerEl.style.padding = '10px';
   dinnerPickerEl.style.borderRadius = '6px';
   dinnerPickerEl.style.zIndex = '9999';
 
@@ -382,19 +623,19 @@ function initDinnerPicker() {
   DINNER_OPTIONS.forEach(t => {
     const line = document.createElement('div');
     line.style.display = 'flex';
-    line.style.justifyContent = 'space-between';
     line.style.alignItems = 'center';
     line.style.gap = '10px';
     line.style.padding = '2px 0';
 
     const btn = document.createElement('div');
     btn.textContent = t;
+    btn.style.fontSize = '1.4rem';
     btn.style.padding = '4px 8px';
     btn.style.cursor = 'pointer';
     btn.style.flex = '0 0 auto';
 
     const countSpan = document.createElement('span');
-    countSpan.style.fontSize = '0.8rem';
+    countSpan.style.fontSize = '1rem';
     countSpan.style.color = '#555';
     countSpan.textContent = '';
 
@@ -420,12 +661,13 @@ function initDinnerPicker() {
   input.placeholder = 'その他の時間...';
   input.style.marginTop = '10px';
   input.style.width = '100%';
-  input.style.padding = '3px';
+  input.style.padding = '8px';
 
   const okBtn = document.createElement('button');
   okBtn.textContent = 'OK';
   okBtn.style.marginTop = '10px';
   okBtn.style.width = '100%';
+  okBtn.style.padding = '8px';
 
   okBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -546,7 +788,7 @@ function initBreakfastPicker() {
   breakfastPickerEl.style.position = 'absolute';
   breakfastPickerEl.style.display = 'none';
   breakfastPickerEl.style.background = '#fff';
-  breakfastPickerEl.style.padding = '6px';
+  breakfastPickerEl.style.padding = '10px';
   breakfastPickerEl.style.borderRadius = '6px';
   breakfastPickerEl.style.zIndex = '9999';
 
@@ -554,6 +796,7 @@ function initBreakfastPicker() {
     const btn = document.createElement('div');
     btn.textContent = t;
     btn.style.padding = '4px 8px';
+    btn.style.fontSize = '1.4rem';
     btn.style.cursor = 'pointer';
 
     btn.addEventListener('click', () => {
@@ -573,10 +816,12 @@ function initBreakfastPicker() {
   input.placeholder = 'その他...';
   input.style.marginTop = '10px';
   input.style.width = '100%';
+  input.style.padding = '8px';
 
   const okBtn = document.createElement('button');
   okBtn.textContent = 'OK';
   okBtn.style.marginTop = '10px';
+  okBtn.style.padding = '8px';
   okBtn.style.width = '100%';
 
   okBtn.addEventListener('click', () => {
@@ -694,7 +939,7 @@ function initNoteEditor() {
   noteEditorEl.style.position = 'absolute';
   noteEditorEl.style.display = 'none';
   noteEditorEl.style.background = '#fff';
-  noteEditorEl.style.padding = '6px';
+  noteEditorEl.style.padding = '10px';
   noteEditorEl.style.borderRadius = '6px';
   noteEditorEl.style.zIndex = '9999';
   noteEditorEl.style.width = '260px';
@@ -753,6 +998,7 @@ function initNoteEditor() {
   const okBtn = document.createElement('button');
   okBtn.textContent = 'OK';
   okBtn.style.marginTop = '10px';
+  okBtn.style.padding = '10px';
   okBtn.style.width = '100%';
 
   okBtn.addEventListener('click', () => {

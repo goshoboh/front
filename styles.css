@@ -15,6 +15,17 @@ header {
   align-items: center;
 }
 
+/* 部屋移動モーダル内で選択中の行 */
+#roomMoveModal tbody tr.selected {
+  background-color: #cce5ff;
+}
+.movebtn {
+  padding: 8px;
+  width: 60%;
+  margin: 0 auto;
+}
+
+
 #dateInput{
   font-size: 1.5rem;
   border-radius: 4px;
@@ -32,20 +43,23 @@ header {
 .header-right{
   height: 100%;
 }
-
 form {
-  display: contents;
+  display: contents; /* ← 子要素だけ親と同列に扱う */
 }
 .headbtn {
   height: 100%;
   border: none;
-  padding: 5px;
+  padding: 5px 10px;
   margin-left: 4px;
   font-size: 1rem;
   background: #fff;
   color: #1976d2;
   border-radius: 4px;
   cursor: pointer;
+}
+.sheetlink{
+  background-color: rgb(84, 167, 139);
+  color:rgb(255, 255, 255);
 }
 
 #status {
@@ -68,7 +82,7 @@ table {
 }
 
 th {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   border: 1px solid #ddd;
   background: #eee;
 }
@@ -81,20 +95,31 @@ td {
   font-size: 0.85rem;
 }
 
-table th:nth-child(1),
 table td:nth-child(1) {
   min-width: 40px;
 }
 
+table td:nth-child(3){
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* 係列 */
+table th:nth-child(10),
+table td:nth-child(10) {
+  min-width: 53px;
+}
 /* 夕食列 */
-table th:nth-child(11),
+table th:nth-child(11) ,
 table td:nth-child(11) {
   min-width: 53px;
+  border-left: #c2c2c2 solid 2px;
 }
 
 table th:nth-child(12),
 table td:nth-child(12) {
   min-width: 40px;
+  border-right: #c2c2c2 solid 2px;
 }
 
 /* ピッカーウィンドウ全般 */
@@ -139,4 +164,3 @@ table td:nth-child(12) {
 td.no-cell {
   cursor: pointer;
 }
-

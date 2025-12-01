@@ -7,10 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- PWA: manifest -->
-  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="manifest" href="manifest.webmanifest" />
 
   <!-- PWA: テーマ色（Androidのアドレスバーの色など） -->
-  <meta name="theme-color" content="#0d47a1" />
+  <meta name="theme-color" content="#fff" />
 
   <!-- iOS / iPadOS PWA: ホーム画面用タイトル -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -18,19 +18,19 @@
   <meta name="apple-mobile-web-app-title" content="My PWA App" />
 
   <!-- iOS / iPadOS PWA: アイコン（サイズ違いを複数用意するとベター） -->
-  <link rel="apple-touch-icon" href="/icons/apple-icon-180.png" />
+  <link rel="apple-touch-icon" href=".icons/apple-icon-180.png" />
   <!-- 余裕があればこんな感じで -->
-  <!-- <link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-icon-120.png" /> -->
-  <!-- <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-icon-152.png" /> -->
+  <!-- <link rel="apple-touch-icon" sizes="120x120" href="icons/apple-icon-120.png" /> -->
+  <!-- <link rel="apple-touch-icon" sizes="152x152" href="icons/apple-icon-152.png" /> -->
 
   <!-- favicon（ついでに）-->
-  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <!-- 互換性重視なら -->
   <!-- <link rel="shortcut icon" href="/favicon.ico" /> -->
-   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
-    <link rel="shortcut icon" href="/favicon.ico" />
+   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
+    <link rel="shortcut icon" href="favicon.ico" />
 
 
 </head>
@@ -42,10 +42,11 @@
       <form
         action="https://docs.google.com/spreadsheets/d/179xwXMPpkSZ7GRqLGRhCmFPXvXHWARCUz23qQCCZC6k/edit"
         target="_blank">
-        <button type="submit" class="headbtn">
+        <button type="submit" class="sheetlink headbtn">
           スプレッドシート
         </button>
       </form>
+      <button id="roomMoveButton" class="headbtn">部屋移動</button>
       <button id="loadButton" class="headbtn">再読込</button>
     </div>
   </header>
@@ -68,5 +69,3 @@
 
 </body>
 </html>
-
-
