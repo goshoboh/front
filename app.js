@@ -1249,6 +1249,28 @@ window.addEventListener('DOMContentLoaded', () => {
   loadForCurrentDate();       //  自動で今日のシートを読み込む
 });
 
+// ==== 60秒ごとに自動リロード ====
+setInterval(() => {
+  // ★ ピッカーが開いているときは更新しない
+  if (isAnyPickerOpen()) {
+    return;
+  }
+  // ★ 読み込み
+  loadForCurrentDate();
+}, 60000);
+
+
+function isAnyPickerOpen() {
+  const pickers = document.querySelectorAll('.pickwindow');
+  for (const p of pickers) {
+    const style = window.getComputedStyle(p);
+    if (style.display !== 'none') {
+      return true;
+    }
+  }
+  return false;
+}
+
 
 
 
