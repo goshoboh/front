@@ -1597,6 +1597,7 @@ function renderTable(
   let noColIndex       = header.indexOf("No");
   let nameColIndex     = header.indexOf("氏名");
   const nightsColIndex     = header.indexOf("泊数");
+  const stayplan     = header.indexOf("商品名");
   const staffColIndex      = header.indexOf("係");
   const dinnerColIndex    = header.indexOf("夕食");
   const breakfastColIndex = header.indexOf("朝食");
@@ -1651,11 +1652,19 @@ function renderTable(
         });
       }
 
-       // 泊数列："1/1" 以外なら赤字
+       // 泊数列："1/1" 以外ならハイライト
       if (nightsColIndex !== -1 && cIndex === nightsColIndex) {
         const text = td.textContent.trim();
         if (text !== "" && text !== "1/1") {
-          td.classList.add('highlight');  
+          td.classList.add('highlight-yellow');  
+        }
+      }
+
+      // プラン："部屋食" ならハイライト
+      if (stayplan !== -1 && cIndex === stayplan) {
+        const text = td.textContent.trim();
+        if (text !== "" && text === "部屋食") {
+          td.classList.add('highlight-green');  
         }
       }
 

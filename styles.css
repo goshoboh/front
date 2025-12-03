@@ -131,12 +131,21 @@ table td:nth-child(12) {
 
 /* 蛍光ペン */
 /* 泊数セルを“マーカー風”にする例 */
-td.highlight {
+td.highlight-yellow {
   background-image: linear-gradient(
     to bottom,
     transparent 30%,
     rgb(255, 243, 82) 40%,
     rgba(255, 243, 82) 70%,
+    transparent 70%
+  );
+}td.highlight-green {
+  background-image: 
+  linear-gradient(
+    to bottom,
+    transparent 30%,
+    rgb(88, 255, 82) 40%,
+    rgba(88, 255, 82) 70%,
     transparent 70%
   );
 }
