@@ -1,6 +1,6 @@
 {
-  "name": "My PWA App",
-  "short_name": "MyPWA",
+  "name": "フロント台帳",
+  "short_name": "フロント台帳",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -18,4 +18,3 @@
     }
   ]
 }
-
