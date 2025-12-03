@@ -129,6 +129,19 @@ table td:nth-child(12) {
   margin: 10px;
 }
 
+/* 蛍光ペン */
+/* 泊数セルを“マーカー風”にする例 */
+td.highlight {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 30%,
+    rgb(255, 243, 82) 40%,
+    rgba(255, 243, 82) 70%,
+    transparent 70%
+  );
+}
+
+
 
 /* カラーピッカー */
 .color-picker {

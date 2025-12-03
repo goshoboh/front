@@ -1596,6 +1596,7 @@ function renderTable(
   const header = matrix[0];
   let noColIndex       = header.indexOf("No");
   let nameColIndex     = header.indexOf("氏名");
+  const nightsColIndex     = header.indexOf("泊数");
   const staffColIndex      = header.indexOf("係");
   const dinnerColIndex    = header.indexOf("夕食");
   const breakfastColIndex = header.indexOf("朝食");
@@ -1649,6 +1650,15 @@ function renderTable(
           showColorPicker(td, sheetRowIndex);
         });
       }
+
+       // 泊数列："1/1" 以外なら赤字
+      if (nightsColIndex !== -1 && cIndex === nightsColIndex) {
+        const text = td.textContent.trim();
+        if (text !== "" && text !== "1/1") {
+          td.classList.add('highlight');  
+        }
+      }
+
 
       // 夕食
       if (cIndex === dinnerColIndex) {
