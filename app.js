@@ -694,6 +694,7 @@ function initGuestModal() {
 
   const applyBtn = document.createElement('button');
   applyBtn.textContent = '変更';
+  applyBtn.disabled = false;
   applyBtn.className = 'guest-modal-button guest-modal-button-primary';
   applyBtn.addEventListener('click', () => {
     applyGuestCounts(applyBtn);
@@ -2006,3 +2007,4 @@ function escapeHtml(str) {
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#39;");
 }
+
