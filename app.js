@@ -263,6 +263,9 @@ async function executeRoomMove() {
     // 成功
     closeRoomMoveModal();
     // 再読み込み
+    tableContainer.innerHTML = '';
+    statusSpan.textContent = '読み込み中…';
+    statusSpan.style.display = 'inline';
     loadForCurrentDate();
 
   } catch (e) {
@@ -1218,6 +1221,10 @@ function initDateNavigation() {
     if (!val) return;
     const [y, m, d] = val.split('-').map(Number);
     currentDate = new Date(y, m - 1, d);
+
+    tableContainer.innerHTML = '';
+    statusSpan.textContent = '読み込み中…';
+    statusSpan.style.display = 'inline';
     loadForCurrentDate();
   });
 
@@ -1239,6 +1246,10 @@ function initDateNavigation() {
 
 function changeCurrentDateByDays(delta) {
   currentDate.setDate(currentDate.getDate() + delta);
+  
+  tableContainer.innerHTML = '';
+  statusSpan.textContent = '読み込み中…';
+  statusSpan.style.display = 'inline';
   loadForCurrentDate();
 }
 
@@ -1246,6 +1257,9 @@ function changeCurrentDateByDays(delta) {
 window.addEventListener('DOMContentLoaded', () => {
   currentDate = new Date();   // 今日
   initDateNavigation();       // ヘッダーに type=date＋ボタンをセット
+  
+  statusSpan.textContent = '読み込み中…';
+  statusSpan.style.display = 'inline';
   loadForCurrentDate();       //  自動で今日のシートを読み込む
 });
 
@@ -1286,6 +1300,8 @@ const tableContainer = document.getElementById('tableContainer');
 // ボタン押下イベント
 // =======================
 loadButton.addEventListener('click', () => {
+  statusSpan.textContent = '読み込み中…';
+  statusSpan.style.display = 'inline';
   loadForCurrentDate();
 });
 
@@ -1295,11 +1311,6 @@ loadButton.addEventListener('click', () => {
 // =======================
 async function fetchAndRender(sheetId) {
   const targetSheetId = sheetId || currentSheetId || dateToSheetId(currentDate);
-
-  // 毎回いったんリセットして「読み込み中」を表示
-  tableContainer.innerHTML = '';
-  statusSpan.textContent = '読み込み中…';
-  statusSpan.style.display = 'inline';
 
   try {
     // ★ すでに authKey を持っている端末 → どの日付でもキーワード認証は一切しない
