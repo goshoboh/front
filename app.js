@@ -382,6 +382,7 @@ function initColorPicker() {
 
 function showColorPicker(cell, rowIndex) {
   initColorPicker();
+  closeAllPickers();
   currentRowIndexForColor = rowIndex;
 
   colorPickerEl.style.display = 'flex';
@@ -495,6 +496,7 @@ function updateRowStatusBackground(tr, status) {
 
 function showStatusPicker(cell, rowIndex) {
   initStatusPicker();
+  closeAllPickers();
   currentStatusTarget = cell;
   currentStatusRowIndex = rowIndex;
 
@@ -569,6 +571,229 @@ function normalizeTimeValue(v) {
   // どうしても解釈できないものはそのまま
   return s;
 }
+
+
+// ==== 人数変更モーダル用 ====
+let guestModalEl = null;
+let guestNoEl = null;
+let guestNameEl = null;
+let guestCountEls = {}; // { male, female, child, infant } の表示用
+let guestCounts = { male: 0, female: 0, child: 0, infant: 0 };
+let currentGuestRowIndex = null;
+
+function initGuestModal() {
+  if (guestModalEl) return;
+
+  // オーバーレイ
+  guestModalEl = document.createElement('div');
+  guestModalEl.id = 'guestModal';
+  guestModalEl.className = 'guest-modal-overlay';  // ★ 見た目はCSSに任せる
+  guestModalEl.style.display = 'none';             // 表示/非表示だけJSで制御
+
+  const content = document.createElement('div');
+  content.className = 'guest-modal';               // ★ 本体の見た目はCSS側
+
+  const title = document.createElement('div');
+  title.textContent = '人数変更';
+  title.className = 'guest-modal-title';
+  content.appendChild(title);
+
+  const noRow = document.createElement('div');
+  noRow.className = 'guest-modal-row';
+  guestNoEl = document.createElement('span');
+  noRow.appendChild(document.createTextNode(''));
+  noRow.appendChild(guestNoEl);
+  content.appendChild(noRow);
+
+  const nameRow = document.createElement('div');
+  nameRow.className = 'guest-modal-row';
+  guestNameEl = document.createElement('span');
+  nameRow.appendChild(document.createTextNode(''));
+  nameRow.appendChild(guestNameEl);
+  content.appendChild(nameRow);
+
+  // 人数行
+  const labels = [
+    { key: 'male',   label: '男' },
+    { key: 'female', label: '女' },
+    { key: 'child',  label: '子供' },
+    { key: 'infant', label: '幼児' }
+  ];
+
+  const table = document.createElement('table');
+  table.className = 'guest-modal-table';
+
+  const thead = document.createElement('thead');
+  const trHead = document.createElement('tr');
+  labels.forEach(info => {
+    const th = document.createElement('th');
+    th.textContent = info.label;
+    trHead.appendChild(th);
+  });
+  thead.appendChild(trHead);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  const trUp = document.createElement('tr');
+  const trVal = document.createElement('tr');
+  const trDown = document.createElement('tr');
+
+  labels.forEach(info => {
+    // ▲
+    const tdUp = document.createElement('td');
+    tdUp.className = 'guest-modal-cell';
+    const btnUp = document.createElement('button');
+    btnUp.textContent = '▲';
+    btnUp.className = 'guest-modal-arrow guest-modal-arrow-up';
+    btnUp.addEventListener('click', () => {
+      changeGuestCount(info.key, +1);
+    });
+    tdUp.appendChild(btnUp);
+    trUp.appendChild(tdUp);
+
+    // 値
+    const tdVal = document.createElement('td');
+    tdVal.className = 'guest-modal-cell';
+    const span = document.createElement('span');
+    span.textContent = '0';
+    span.className = 'guest-modal-count';
+    guestCountEls[info.key] = span;
+    tdVal.appendChild(span);
+    trVal.appendChild(tdVal);
+
+    // ▼
+    const tdDown = document.createElement('td');
+    tdDown.className = 'guest-modal-cell';
+    const btnDown = document.createElement('button');
+    btnDown.textContent = '▼';
+    btnDown.className = 'guest-modal-arrow guest-modal-arrow-down';
+    btnDown.addEventListener('click', () => {
+      changeGuestCount(info.key, -1);
+    });
+    tdDown.appendChild(btnDown);
+    trDown.appendChild(tdDown);
+  });
+
+  tbody.appendChild(trUp);
+  tbody.appendChild(trVal);
+  tbody.appendChild(trDown);
+  table.appendChild(tbody);
+
+  content.appendChild(table);
+
+  // ボタン行
+  const btnRow = document.createElement('div');
+  btnRow.className = 'guest-modal-buttons';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'キャンセル';
+  cancelBtn.className = 'guest-modal-button guest-modal-button-secondary';
+  cancelBtn.addEventListener('click', () => {
+    hideGuestModal();
+  });
+
+  const applyBtn = document.createElement('button');
+  applyBtn.textContent = '変更';
+  applyBtn.className = 'guest-modal-button guest-modal-button-primary';
+  applyBtn.addEventListener('click', () => {
+    applyGuestCounts(applyBtn);
+  });
+
+  btnRow.appendChild(cancelBtn);
+  btnRow.appendChild(applyBtn);
+  content.appendChild(btnRow);
+
+  guestModalEl.appendChild(content);
+  document.body.appendChild(guestModalEl);
+
+  // オーバーレイクリックで閉じる（中身クリックは閉じない）
+  guestModalEl.addEventListener('click', (e) => {
+    if (e.target === guestModalEl) {
+      hideGuestModal();
+    }
+  });
+}
+
+
+function changeGuestCount(key, delta) {
+  let v = guestCounts[key] || 0;
+  v += delta;
+  if (v < 0) v = 0;
+  guestCounts[key] = v;
+  if (guestCountEls[key]) {
+    guestCountEls[key].textContent = String(v);
+  }
+}
+
+function showGuestModal(rowIndex, noText, nameText, male, female, child, infant) {
+  initGuestModal();
+  closeAllPickers && closeAllPickers(); // 他のピッカーは閉じる（関数があれば）
+
+  currentGuestRowIndex = rowIndex;
+
+  guestNoEl.textContent = noText || '';
+  guestNameEl.textContent = nameText || '';
+
+  guestCounts.male   = male   || 0;
+  guestCounts.female = female || 0;
+  guestCounts.child  = child  || 0;
+  guestCounts.infant = infant || 0;
+
+  Object.keys(guestCountEls).forEach(key => {
+    guestCountEls[key].textContent = String(guestCounts[key] || 0);
+  });
+
+  guestModalEl.style.display = 'flex';
+}
+
+function hideGuestModal() {
+  if (!guestModalEl) return;
+  guestModalEl.style.display = 'none';
+  currentGuestRowIndex = null;
+}
+
+async function applyGuestCounts(applyBtn) {
+  if (!currentGuestRowIndex) {
+    hideGuestModal();
+    return;
+  }
+
+  if (applyBtn) {
+    applyBtn.disabled = true;
+  }
+
+  try {
+    await saveGuestCountsToSheet(currentGuestRowIndex, guestCounts);
+    hideGuestModal();
+    // 再読み込み（現在日付のシート）
+    loadForCurrentDate();
+  } catch (e) {
+    console.error('人数更新エラー:', e);
+    alert('人数の更新に失敗しました: ' + e.message);
+     if (applyBtn) {
+      applyBtn.disabled = false;
+    }
+  }
+}
+
+async function saveGuestCountsToSheet(rowIndex, counts) {
+  await fetch(GAS_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({
+      action: 'updateGuests',
+      date: currentSheetId,
+      authKey: authKey,
+      row: rowIndex,
+      male: counts.male || 0,
+      female: counts.female || 0,
+      child: counts.child || 0,
+      infant: counts.infant || 0
+    })
+  });
+}
+
+
 
 
 
@@ -733,6 +958,7 @@ function updateDinnerCounts() {
 
 function showDinnerPicker(cell, rowIndex, currentValue) {
   initDinnerPicker();
+  closeAllPickers();
   currentDinnerCell = cell;
   currentDinnerRowIndex = rowIndex;
 
@@ -850,6 +1076,7 @@ function initBreakfastPicker() {
 
 function showBreakfastPicker(cell, rowIndex, currentValue) {
   initBreakfastPicker();
+  closeAllPickers();
   currentBreakfastCell = cell;
   currentBreakfastRowIndex = rowIndex;
 
@@ -1033,6 +1260,7 @@ function initNoteEditor() {
 
 function showNoteEditor(cell, rowIndex, currentText, currentColorKey) {
   initNoteEditor();
+  closeAllPickers();
   currentNoteCell = cell;
   currentNoteRowIndex = rowIndex;
 
@@ -1120,6 +1348,7 @@ function initStaffPicker() {
 
 function showStaffPicker(cell, rowIndex, currentValue) {
   initStaffPicker();
+  closeAllPickers();
   currentStaffCell = cell;
   currentStaffRowIndex = rowIndex;
 
@@ -1172,6 +1401,19 @@ function hideStaffPicker() {
   currentStaffCell = null;
   currentStaffRowIndex = null;
 }
+
+
+
+// ==== すべてのピッカーを閉じる ====
+function closeAllPickers() {
+  if (colorPickerEl)      colorPickerEl.style.display = 'none';
+  if (statusPickerEl)     statusPickerEl.style.display = 'none';
+  if (staffPickerEl)      staffPickerEl.style.display = 'none';
+  if (dinnerPickerEl)     dinnerPickerEl.style.display = 'none';
+  if (breakfastPickerEl)  breakfastPickerEl.style.display = 'none';
+  if (noteEditorEl)       noteEditorEl.style.display = 'none';
+}
+
 
 
 // =======================
@@ -1587,7 +1829,7 @@ function renderTable(
   rowDinners = [],      // W列の夕食
   rowBreakfasts = [],   // X列の朝食
   rowNotes = [],        // Y列の連絡事項テキスト
-  rowNoteColors = [],    // Y列の連絡事項文字色キー（black/red/blue）
+  rowNoteColors = [],   // Y列の連絡事項文字色キー（black/red/blue）
   rowStaffs = []
 ) {
   const table = document.createElement("table");
@@ -1607,9 +1849,11 @@ function renderTable(
   const header = matrix[0];
   let noColIndex       = header.indexOf("No");
   let nameColIndex     = header.indexOf("氏名");
-  const nightsColIndex     = header.indexOf("泊数");
-  const stayplan     = header.indexOf("商品名");
-  const staffColIndex      = header.indexOf("係");
+  const maleColIndex      = header.indexOf("男");
+  const femaleColIndex    = header.indexOf("女");
+  const childColIndex     = header.indexOf("子供");
+  const infantColIndex    = header.indexOf("幼児");
+  const staffColIndex     = header.indexOf("係");
   const dinnerColIndex    = header.indexOf("夕食");
   const breakfastColIndex = header.indexOf("朝食");
   const noteColIndex      = header.indexOf("連絡事項");
@@ -1632,10 +1876,19 @@ function renderTable(
     const rowNoteColor  = rowNoteColors[r - 1]  || 'black';
     const rowStaff      = rowStaffs[r - 1]      || '';
 
+    // この行の No / 氏名 / 各人数（元データから）
+    const rowData   = matrix[r];
+    const rowNoText   = String(rowData[noColIndex]   ?? '');
+    const rowNameText = String(rowData[nameColIndex] ?? '');
+    const rowMale   = (maleColIndex   !== -1 && rowData[maleColIndex])   ? Number(rowData[maleColIndex])   || 0 : 0;
+    const rowFemale = (femaleColIndex !== -1 && rowData[femaleColIndex]) ? Number(rowData[femaleColIndex]) || 0 : 0;
+    const rowChild  = (childColIndex  !== -1 && rowData[childColIndex])  ? Number(rowData[childColIndex])  || 0 : 0;
+    const rowInfant = (infantColIndex !== -1 && rowData[infantColIndex]) ? Number(rowData[infantColIndex]) || 0 : 0;
+
     // C/I 行の背景色を反映（No/氏名のセル色はこの上に重ねる）
     updateRowStatusBackground(tr, rowStatus);
 
-    matrix[r].forEach((cell, cIndex) => {
+    rowData.forEach((cell, cIndex) => {
       const td = document.createElement("td");
       td.innerHTML = escapeHtml(String(cell ?? '')).replace(/\n/g, "<br>");
 
@@ -1663,22 +1916,28 @@ function renderTable(
         });
       }
 
-       // 泊数列："1/1" 以外ならハイライト
-      if (nightsColIndex !== -1 && cIndex === nightsColIndex) {
-        const text = td.textContent.trim();
-        if (text !== "" && text !== "1/1") {
-          td.classList.add('highlight-yellow');  
-        }
-      }
+      // 男・女・子供・幼児 → 人数変更モーダル
+      const isGuestCol =
+        (maleColIndex   !== -1 && cIndex === maleColIndex) ||
+        (femaleColIndex !== -1 && cIndex === femaleColIndex) ||
+        (childColIndex  !== -1 && cIndex === childColIndex) ||
+        (infantColIndex !== -1 && cIndex === infantColIndex);
 
-      // プラン："部屋食" ならハイライト
-      if (stayplan !== -1 && cIndex === stayplan) {
-        const text = td.textContent.trim();
-        if (text !== "" && text === "部屋食") {
-          td.classList.add('highlight-green');  
-        }
+      if (isGuestCol) {
+        td.style.cursor = 'pointer';
+        td.addEventListener('click', (event) => {
+          event.stopPropagation();
+          showGuestModal(
+            sheetRowIndex,
+            rowNoText,
+            rowNameText,
+            rowMale,
+            rowFemale,
+            rowChild,
+            rowInfant
+          );
+        });
       }
-
 
       // 夕食
       if (cIndex === dinnerColIndex) {
@@ -1709,7 +1968,6 @@ function renderTable(
 
         td.addEventListener('click', (event) => {
           event.stopPropagation();
-          // 現在のテキストと色を渡してエディタを開く
           showNoteEditor(td, sheetRowIndex, rowNoteText, rowNoteColor);
         });
       }
@@ -1723,7 +1981,6 @@ function renderTable(
           showStaffPicker(td, sheetRowIndex, rowStaff);
         });
       }
-
 
       tr.appendChild(td);
     });

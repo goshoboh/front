@@ -104,16 +104,127 @@ table td:nth-child(3){
   font-size: 1.1rem;
 }
 
+/* ===== 人数変更モーダル全体 ===== */
+.guest-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: none;  /* JS側で block/flex にする */
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guest-modal {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  min-width: 320px;
+  width: 50%;
+  max-height: 80vh;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.guest-modal-title {
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+/* No / 氏名 行 */
+.guest-modal-row {
+  font-size: 1.5rem;
+}
+
+/* ===== 人数テーブル部分 ===== */
+.guest-modal-table {
+  width: 100%;
+  margin-top: 4px;
+  table-layout: fixed;
+}
+.guest-modal-table th {
+  padding: 2px 4px;
+  font-size: 1.6rem;
+  border-bottom: none;
+  text-align: center;
+  color:#6e6e6e
+}
+.guest-modal-table td {
+  border-bottom: none;
+}
+.guest-modal-cell {
+  padding: 2px 4px;
+  text-align: center;
+}
+.guest-modal-count {
+  display: inline-block;
+  min-width: 2em;
+  font-size: 2rem;
+  font-weight: bold;
+}
+/* ▲▼ ボタン */
+.guest-modal-arrow {
+  font-size: 2rem;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color:#698f96
+}
+/* ===== 下部ボタン行 ===== */
+.guest-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 30px;
+}
+.guest-modal-button {
+  padding: 8px 20px;
+  font-size: 1.6rem;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.guest-modal-button-primary {
+  background: #007bff;
+  border-color: #007bff;
+  color: #fff;
+}
+.guest-modal-button-primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.guest-modal-button-primary:hover:not(:disabled) {
+  background: #0068d6;
+}
+.guest-modal-button-secondary {
+  background: #f5f5f5;
+  border-color: #ccc;
+  color: #333;
+}
+.guest-modal-button-secondary:hover {
+  background: #e8e8e8;
+}
+
+
+
 /* 係列 */
 table th:nth-child(10),
 table td:nth-child(10) {
   min-width: 53px;
 }
 /* 夕食列 */
-table th:nth-child(11) ,
 table td:nth-child(11) {
   min-width: 53px;
   border-left: #c2c2c2 solid 2px;
+  color: red;
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 
 table th:nth-child(12),
