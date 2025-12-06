@@ -694,7 +694,6 @@ function initGuestModal() {
 
   const applyBtn = document.createElement('button');
   applyBtn.textContent = '変更';
-  applyBtn.disabled = false;
   applyBtn.className = 'guest-modal-button guest-modal-button-primary';
   applyBtn.addEventListener('click', () => {
     applyGuestCounts(applyBtn);
@@ -771,6 +770,7 @@ async function applyGuestCounts(applyBtn) {
   } catch (e) {
     console.error('人数更新エラー:', e);
     alert('人数の更新に失敗しました: ' + e.message);
+  } finally {
      if (applyBtn) {
       applyBtn.disabled = false;
     }
@@ -2007,4 +2007,5 @@ function escapeHtml(str) {
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#39;");
 }
+
 
