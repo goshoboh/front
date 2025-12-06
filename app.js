@@ -309,7 +309,7 @@ let currentNoteColor = 'black';
 // ラジオボタンへの参照を保持
 let noteColorRadioMap = {};
 
-// 係の候補（staffシートA列）と現在値
+// 客室係の候補（staffシートA列）と現在値
 let staffOptions = [];
 
 
@@ -1298,7 +1298,7 @@ function hideNoteEditor() {
 }
 
 
-// ==== 係（Z列）を保存 ====
+// ==== 客室係（Z列）を保存 ====
 async function saveStaffToSheet(rowIndex, staffName) {
   try {
     await fetch(GAS_API_URL, {
@@ -1312,13 +1312,13 @@ async function saveStaffToSheet(rowIndex, staffName) {
       })
     });
   } catch (err) {
-    console.error("係の保存失敗:", err);
+    console.error("客室係の保存失敗:", err);
   }
 }
 
 
 
-// ==== 係ピッカー ====
+// ==== 客室係ピッカー ====
 let staffPickerEl = null;
 let currentStaffCell = null;
 let currentStaffRowIndex = null;
@@ -1358,7 +1358,7 @@ function showStaffPicker(cell, rowIndex, currentValue) {
 
   if (!staffOptions || staffOptions.length === 0) {
     const msg = document.createElement('div');
-    msg.textContent = "係リストがありません";
+    msg.textContent = "客室係リストがありません";
     msg.style.fontSize = '1rem';
     staffPickerEl.appendChild(msg);
   } else {
@@ -1607,7 +1607,7 @@ function handleFetchedData(json) {
     noteColors.push(parsed.color);
   });
 
-  // 係リスト
+  // 客室係リスト
   staffOptions = staffList.slice();
 
   const withNights  = convertNightsFormat(data);
@@ -1781,9 +1781,6 @@ function transformNoColumn(matrix) {
 // =======================
 // 列追加
 // =======================
-// - 一番左に空白列（ステータス表示列）
-// - 商品名の右に「係」「夕食」「朝食」
-// - MEMO の右に「連絡事項」
 function addExtraColumns(matrix) {
   const header = matrix[0];
 
@@ -1799,15 +1796,15 @@ function addExtraColumns(matrix) {
     // 左端に空白列追加（ステータス列）
     row = ["", ...row];
 
-    const newIdxProduct = idxProduct + 1; // 左に1列増えたぶん+1
     const newIdxMemo    = idxMemo + 1;
+    const idxDinner = 9; //夕食列10列目
 
-    // 商品名の右に 3 列追加
-    row.splice(newIdxProduct + 1, 0, "", "", "");
+    // 夕食の右に 3 列追加
+    row.splice(idxDinner + 1, 0, "", "", "");
     if (r === 0) {
-      row[newIdxProduct + 1] = "係";
-      row[newIdxProduct + 2] = "夕食";
-      row[newIdxProduct + 3] = "朝食";
+      row[idxDinner + 1] = "客室係";
+      row[idxDinner + 2] = "夕食時間";
+      row[idxDinner + 3] = "朝食時間";
     }
 
     // MEMO の右に 1 列追加（商品名右に3列足したぶん +3）
@@ -1854,9 +1851,11 @@ function renderTable(
   const femaleColIndex    = header.indexOf("女");
   const childColIndex     = header.indexOf("子供");
   const infantColIndex    = header.indexOf("幼児");
-  const staffColIndex     = header.indexOf("係");
-  const dinnerColIndex    = header.indexOf("夕食");
-  const breakfastColIndex = header.indexOf("朝食");
+  const nightsColIndex     = header.indexOf("泊数");
+  const stayplanColIndex = header.indexOf("商品名");
+  const staffColIndex     = header.indexOf("客室係");
+  const dinnerColIndex    = header.indexOf("夕食時間");
+  const breakfastColIndex = header.indexOf("朝食時間");
   const noteColIndex      = header.indexOf("連絡事項");
 
   if (noColIndex === -1)   noColIndex = 1; // 0:ステータス,1:No
@@ -1940,6 +1939,22 @@ function renderTable(
         });
       }
 
+      // ★ 泊数列："1/1" 以外なら赤字
+      if (nightsColIndex !== -1 && cIndex === nightsColIndex) {
+        const text = td.textContent.trim();
+        if (text !== "" && text !== "1/1") {
+          td.className = "highlight-yellow";
+        }
+      }
+
+      // 商品名が「部屋食」なら中央帯ハイライト
+      if (stayplanColIndex !== -1 && cIndex === stayplanColIndex) {
+        const text = td.textContent.trim();
+        if (text === "部屋食") {
+          td.classList.add('highlight-green');  
+        }
+      }
+
       // 夕食
       if (cIndex === dinnerColIndex) {
         td.textContent = rowDinner || "";
@@ -1973,7 +1988,7 @@ function renderTable(
         });
       }
 
-      // 係
+      // 客室係
       if (cIndex === staffColIndex) {
         td.textContent = rowStaff || "";
         td.style.cursor = 'pointer';
@@ -2007,5 +2022,3 @@ function escapeHtml(str) {
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#39;");
 }
-
-

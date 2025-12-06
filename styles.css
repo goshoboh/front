@@ -214,12 +214,14 @@ table td:nth-child(3){
 
 
 /* 係列 */
-table th:nth-child(10),
-table td:nth-child(10) {
-  min-width: 53px;
+table th:nth-child(11),
+table td:nth-child(11) {
+  font-size: 12px;
+  padding: 2px;
+  text-align: center;
 }
 /* 夕食列 */
-table td:nth-child(11) {
+table td:nth-child(12) {
   min-width: 53px;
   border-left: #c2c2c2 solid 2px;
   color: red;
@@ -227,10 +229,17 @@ table td:nth-child(11) {
   font-size: 1.2rem;
 }
 
-table th:nth-child(12),
-table td:nth-child(12) {
+table th:nth-child(13),
+table td:nth-child(13) {
   min-width: 40px;
   border-right: #c2c2c2 solid 2px;
+}
+/* 交通手段 */
+table td:nth-child(16),
+table td:nth-child(17) {
+  max-width: 30px;
+  padding: 4px;
+  font-size: 0.6em;
 }
 
 /* ピッカーウィンドウ全般 */
