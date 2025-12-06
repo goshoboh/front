@@ -211,16 +211,22 @@ table td:nth-child(3){
   background: #e8e8e8;
 }
 
+/* 夕食 */
+table td:nth-child(10) {
+  font-size: 0.7em;
+  padding: 2px;
+  width: auto;
+  white-space: nowrap;
+}
 
-
-/* 係列 */
+/* 客室係列 */
 table th:nth-child(11),
 table td:nth-child(11) {
   font-size: 12px;
   padding: 2px;
   text-align: center;
 }
-/* 夕食列 */
+/* 夕食時間列 */
 table td:nth-child(12) {
   min-width: 53px;
   border-left: #c2c2c2 solid 2px;
@@ -237,7 +243,7 @@ table td:nth-child(13) {
 /* 交通手段 */
 table td:nth-child(16),
 table td:nth-child(17) {
-  max-width: 30px;
+  max-width: 55px;
   padding: 4px;
   font-size: 0.6em;
 }

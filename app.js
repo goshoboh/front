@@ -1902,6 +1902,15 @@ function renderTable(
         });
       }
 
+      // ★ 氏名列の語尾に「様」を付ける
+      if (cIndex === nameColIndex) {
+        const rawName = String(cell ?? '').trim();   // 元データの生文字
+        if (rawName !== '') {                        // 空白チェック
+          td.innerHTML += '<span style="font-size:0.6em;font-weight:400;"> 様</span>';
+        }
+      }
+
+
       // No & 氏名：色適用 + カラーピッカー
       if (cIndex === noColIndex || cIndex === nameColIndex) {
         if (rowColor) {
