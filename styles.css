@@ -211,6 +211,12 @@ table td:nth-child(3){
   background: #e8e8e8;
 }
 
+/* 商品名 */
+table td:nth-child(9) {
+  padding: 2px;
+  max-width: 90px;
+}
+
 /* 夕食 */
 table td:nth-child(10) {
   font-size: 0.7em;
@@ -266,14 +272,15 @@ td.highlight-yellow {
     transparent 70%
   );
 }td.highlight-green {
-  background-image: 
+  /* background-image: 
   linear-gradient(
     to bottom,
     transparent 30%,
     rgb(88, 255, 82) 40%,
     rgba(88, 255, 82) 70%,
     transparent 70%
-  );
+  ); */
+  background-color: rgb(88,255,82);
 }
 
 
@@ -311,4 +318,33 @@ td.highlight-yellow {
 
 td.no-cell {
   cursor: pointer;
+}
+
+
+/* 連絡事項のラジオボタン */
+.note-color-option {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 6px;
+  cursor: pointer;
+}
+/* ラジオボタンは隠す */
+.note-color-option input[type="radio"] {
+  display: none;
+}
+/* ピル型ラベル */
+.note-color-label {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  line-height: 1;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+/* 選択中 */
+.note-color-option input[type="radio"]:checked + .note-color-label {
+  border-color: currentColor;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  font-weight: bold;
 }

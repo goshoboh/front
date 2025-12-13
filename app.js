@@ -284,11 +284,11 @@ async function executeRoomMove() {
 
 const COLOR_OPTIONS = [
   'transparent', // 無色
-  '#d8a393ff',
+  '#e4c7e2ff',
   '#e4e3b3ff',
   '#8acad3ff',
   '#b3aae4ff',
-  '#d892b9ff',
+  '#e0c9baff',
   '#7aff5fff',
   '#20def7ff',
   '#bdbdbdff'
@@ -1173,13 +1173,14 @@ function initNoteEditor() {
   noteEditorEl.style.padding = '10px';
   noteEditorEl.style.borderRadius = '6px';
   noteEditorEl.style.zIndex = '9999';
-  noteEditorEl.style.width = '260px';
+  noteEditorEl.style.width = '300px';
   noteEditorEl.id = 'Notetxt';
 
   // テキストエリア
   noteTextarea = document.createElement('textarea');
   noteTextarea.rows = 4;
   noteTextarea.style.width = '100%';
+  noteTextarea.style.fontSize = '20px'; 
 
   // 色選択（黒・赤・青のラジオボタン）
   const colorWrapper = document.createElement('div');
@@ -1190,40 +1191,39 @@ function initNoteEditor() {
 
   const labelTitle = document.createElement('span');
   labelTitle.textContent = '文字色:';
-  labelTitle.style.fontSize = '0.85rem';
+  labelTitle.style.fontSize = '1rem';
   colorWrapper.appendChild(labelTitle);
 
   noteColorRadioMap = {};
   ['black', 'red', 'blue'].forEach(colorKey => {
-    const label = document.createElement('label');
-    label.style.display = 'flex';
-    label.style.alignItems = 'center';
-    label.style.gap = '2px';
-    label.style.fontSize = '0.85rem';
+  const label = document.createElement('label');
+  label.className = 'note-color-option';   // ★追加
 
-    const radio = document.createElement('input');
-    radio.type = 'radio';
-    radio.name = 'noteColor';
-    radio.value = colorKey;
+  const radio = document.createElement('input');
+  radio.type = 'radio';
+  radio.name = 'noteColor';
+  radio.value = colorKey;
 
-    const swatch = document.createElement('span');
-    swatch.textContent =
-      colorKey === 'black' ? '黒' :
-      colorKey === 'red'   ? '赤' : '青';
-    swatch.style.color = NOTE_COLOR_MAP[colorKey];
+  const swatch = document.createElement('span');
+  swatch.className = 'note-color-label';   // ★追加
+  swatch.textContent =
+    colorKey === 'black' ? '黒' :
+    colorKey === 'red'   ? '赤' : '青';
+  swatch.style.color = NOTE_COLOR_MAP[colorKey];
 
-    radio.addEventListener('change', () => {
-      if (radio.checked) {
-        currentNoteColor = colorKey;
-      }
-    });
-
-    noteColorRadioMap[colorKey] = radio;
-
-    label.appendChild(radio);
-    label.appendChild(swatch);
-    colorWrapper.appendChild(label);
+  radio.addEventListener('change', () => {
+    if (radio.checked) {
+      currentNoteColor = colorKey;
+    }
   });
+
+  noteColorRadioMap[colorKey] = radio;
+
+  label.appendChild(radio);
+  label.appendChild(swatch);
+  colorWrapper.appendChild(label);
+});
+
 
   // OK ボタン
   const okBtn = document.createElement('button');
@@ -1265,7 +1265,7 @@ function showNoteEditor(cell, rowIndex, currentText, currentColorKey) {
   currentNoteCell = cell;
   currentNoteRowIndex = rowIndex;
 
-  noteTextarea.value = currentText || '';
+  noteTextarea.value = (currentText ?? '');
 
   currentNoteColor = currentColorKey || 'black';
   Object.entries(noteColorRadioMap).forEach(([key, radio]) => {
@@ -1404,6 +1404,127 @@ function hideStaffPicker() {
 }
 
 
+// ==== 車ピッカー用 ====
+let carPickerEl = null;
+let currentCarCell = null;
+let currentCarRowIndex = null;
+function initCarPicker() {
+  if (carPickerEl) return;
+
+  carPickerEl = document.createElement('div');
+  carPickerEl.id = 'carPicker';
+  carPickerEl.className = 'picker';
+  carPickerEl.style.display = 'none';
+  carPickerEl.style.position = 'absolute';
+  carPickerEl.style.zIndex = '9999';
+  carPickerEl.style.background = '#fff';
+  carPickerEl.style.border = '1px solid #ccc';
+  carPickerEl.style.borderRadius = '8px';
+  carPickerEl.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+  carPickerEl.style.padding = '8px';
+  carPickerEl.style.minWidth = '160px';
+
+  // タイトル（No表示用：他ピッカーと同じ要領）
+  const title = document.createElement('div');
+  title.className = 'picker-title';
+  title.style.fontWeight = 'bold';
+  title.style.padding = '6px 8px';
+  title.style.margin = '-8px -8px 8px -8px';
+  title.style.borderBottom = '1px solid #ddd';
+  title.style.background = '#f7f7f7';
+  carPickerEl.appendChild(title);
+
+  const options = ['車', '電車', 'バス', 'ロープウェー', '']; // 空白も入れる（クリア用）
+
+  options.forEach(v => {
+    const btn = document.createElement('div');
+    btn.textContent = v === '' ? '（空白）' : v;
+    btn.style.padding = '6px 8px';
+    btn.style.cursor = 'pointer';
+    btn.style.borderRadius = '6px';
+
+    btn.addEventListener('mouseenter', () => btn.style.background = '#f2f2f2');
+    btn.addEventListener('mouseleave', () => btn.style.background = 'transparent');
+
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const value = v; // '' はクリア
+      if (currentCarCell && currentCarRowIndex != null) {
+        currentCarCell.textContent = value;
+        await saveCarToSheet(currentCarRowIndex, value);
+      }
+      hideCarPicker();
+    });
+
+    carPickerEl.appendChild(btn);
+  });
+
+  document.body.appendChild(carPickerEl);
+
+  // 外側クリックで閉じる
+  document.addEventListener('click', (e) => {
+    if (!carPickerEl) return;
+    if (carPickerEl.style.display === 'none') return;
+    if (!carPickerEl.contains(e.target)) hideCarPicker();
+  });
+}
+function showCarPicker(cell, rowIndex) {
+  initCarPicker();
+  closeAllPickers && closeAllPickers(); // 他ピッカーが開いてたら閉じる
+
+  currentCarCell = cell;
+  currentCarRowIndex = rowIndex;
+
+  // タイトルに No を表示（2列目Noは data-row-index を使って取る想定）
+  // 既に「ピッカーにNo表示」仕組みがあるならそれに合わせてOK
+  const noText = (() => {
+    const tr = cell.closest('tr');
+    if (!tr) return '';
+    const tds = tr.querySelectorAll('td');
+    return tds[1] ? (tds[1].textContent || '').trim() : '';
+  })();
+  carPickerEl.querySelector('.picker-title').textContent = `${noText}`;
+
+  // 表示＆位置決め（12行目より下なら上に出すルール）
+  carPickerEl.style.display = 'block';
+  const rect = cell.getBoundingClientRect();
+  const isBelow = rowIndex <= 12;
+
+  if (isBelow) {
+    carPickerEl.style.left = (window.scrollX + rect.left - 100) + 'px';
+    carPickerEl.style.top  = (window.scrollY + rect.bottom + 4) + 'px';
+  } else {
+    carPickerEl.style.left = (window.scrollX + rect.left - 100) + 'px';
+    carPickerEl.style.top  = (window.scrollY + rect.top - carPickerEl.offsetHeight - 4) + 'px';
+  }
+}
+function hideCarPicker() {
+  if (!carPickerEl) return;
+  carPickerEl.style.display = 'none';
+  currentCarCell = null;
+  currentCarRowIndex = null;
+}
+async function saveCarToSheet(rowIndex, value) {
+  const res = await fetch(GAS_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({
+      date: currentSheetId,
+      authKey: authKey,
+      row: rowIndex,
+      car: value || '' // P列に書く
+    })
+  });
+  const json = await res.json();
+  if (!json.success) {
+    console.error(json);
+    alert(json.message || '車の保存に失敗しました');
+  }
+  
+}
+
+
+
 
 // ==== すべてのピッカーを閉じる ====
 function closeAllPickers() {
@@ -1413,6 +1534,7 @@ function closeAllPickers() {
   if (dinnerPickerEl)     dinnerPickerEl.style.display = 'none';
   if (breakfastPickerEl)  breakfastPickerEl.style.display = 'none';
   if (noteEditorEl)       noteEditorEl.style.display = 'none';
+  if (carPickerEl)        carPickerEl.style.display = 'none';
 }
 
 
@@ -1851,12 +1973,14 @@ function renderTable(
   const femaleColIndex    = header.indexOf("女");
   const childColIndex     = header.indexOf("子供");
   const infantColIndex    = header.indexOf("幼児");
-  const nightsColIndex     = header.indexOf("泊数");
-  const stayplanColIndex = header.indexOf("商品名");
+  const nightsColIndex    = header.indexOf("泊数");
+  const stayplanColIndex  = header.indexOf("商品名");
   const staffColIndex     = header.indexOf("客室係");
   const dinnerColIndex    = header.indexOf("夕食時間");
   const breakfastColIndex = header.indexOf("朝食時間");
   const noteColIndex      = header.indexOf("連絡事項");
+  const carColIndex       = header.indexOf("車");
+
 
   if (noColIndex === -1)   noColIndex = 1; // 0:ステータス,1:No
   if (nameColIndex === -1) nameColIndex = 2; // 2:氏名
@@ -1959,8 +2083,8 @@ function renderTable(
       // 商品名が「部屋食」なら中央帯ハイライト
       if (stayplanColIndex !== -1 && cIndex === stayplanColIndex) {
         const text = td.textContent.trim();
-        if (text === "部屋食") {
-          td.classList.add('highlight-green');  
+        if (text.includes("部屋食")) {
+          td.classList.add('highlight-green');
         }
       }
 
@@ -1986,14 +2110,15 @@ function renderTable(
 
       // 連絡事項
       if (cIndex === noteColIndex) {
-        td.textContent = rowNoteText || "";
+        td.innerHTML = escapeHtml(String(rowNoteText || '')).replace(/\n/g, "<br>");
+
         td.style.cursor = 'pointer';
         td.style.color =
           NOTE_COLOR_MAP[rowNoteColor] || NOTE_COLOR_MAP.black;
 
         td.addEventListener('click', (event) => {
           event.stopPropagation();
-          showNoteEditor(td, sheetRowIndex, rowNoteText, rowNoteColor);
+          showNoteEditor(td, sheetRowIndex, rowNoteText || "", rowNoteColor || "black");
         });
       }
 
@@ -2006,6 +2131,17 @@ function renderTable(
           showStaffPicker(td, sheetRowIndex, rowStaff);
         });
       }
+
+      // 車（P列）
+      if (carColIndex !== -1 && cIndex === carColIndex) {
+        td.textContent = String(cell ?? '');
+        td.style.cursor = 'pointer';
+        td.addEventListener('click', (event) => {
+          event.stopPropagation();
+          showCarPicker(td, sheetRowIndex);
+        });
+      }
+
 
       tr.appendChild(td);
     });
