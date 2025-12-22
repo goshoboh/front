@@ -261,6 +261,17 @@ table td:nth-child(17) {
   margin: 10px;
 }
 
+/* ピッカー操作中の行を枠でハイライト（背景色は触らない） */
+tr.row-active td {
+  background-color: #cbd6f5;
+  /* border-top: 2px solid #007bff;
+  border-bottom: 2px solid #007bff; */
+  box-shadow:
+    inset 0  1px 0 #007bff,  /* 上 */
+    inset 0 -1px 0 #007bff;  /* 下 */
+}
+
+
 /* 蛍光ペン */
 /* 泊数セルを“マーカー風”にする例 */
 td.highlight-yellow {
