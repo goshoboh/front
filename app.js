@@ -37,7 +37,7 @@ let roomMoveTableBodyEl = null;
 let roomMoveExecButton = null;
 let roomMoveStatusEl = null;
 let roomMoveSelectedRows = []; // シートの行番号（1始まり）を入れる
-document.getElementById('roomMoveButton').addEventListener('click' , () => {
+document.getElementById('roomMoveButton').addEventListener('click', () => {
   openRoomMoveModal();
 });
 
@@ -116,7 +116,7 @@ function initRoomMoveModal() {
   buttonRow.style.flexDirection = 'column';
   buttonRow.style.gap = '10px';
 
-  
+
   roomMoveExecButton = document.createElement('button');
   roomMoveExecButton.textContent = '部屋移動を実行';
   roomMoveExecButton.disabled = true;
@@ -319,8 +319,8 @@ let currentRowIndexForColor = null; // どの行の色か（シート行番号�
 // 連絡事項の文字色マップ
 const NOTE_COLOR_MAP = {
   black: '#000000',
-  red:   '#ff0000ff',
-  blue:  '#0026ffff'
+  red: '#ff0000ff',
+  blue: '#0026ffff'
 };
 
 // 現在の連絡事項の色
@@ -388,13 +388,6 @@ function initColorPicker() {
   });
 
   document.body.appendChild(colorPickerEl);
-
-  // ピッカー外クリックで閉じる
-  document.addEventListener('click', (e) => {
-    if (!colorPickerEl) return;
-    if (colorPickerEl.contains(e.target)) return;
-    closeAllPickers();
-  });
 }
 
 
@@ -412,10 +405,10 @@ function showColorPicker(cell, rowIndex) {
 
   if (isBelow) {
     colorPickerEl.style.left = window.scrollX + rect.left + 'px';
-    colorPickerEl.style.top  = window.scrollY + rect.bottom + 4 + 'px';
+    colorPickerEl.style.top = window.scrollY + rect.bottom + 4 + 'px';
   } else {
     colorPickerEl.style.left = window.scrollX + rect.left + 'px';
-    colorPickerEl.style.top  = window.scrollY + rect.top - colorPickerEl.offsetHeight - 4 + 'px';
+    colorPickerEl.style.top = window.scrollY + rect.top - colorPickerEl.offsetHeight - 4 + 'px';
   }
 }
 
@@ -496,12 +489,6 @@ function initStatusPicker() {
   });
 
   document.body.appendChild(statusPickerEl);
-
-  document.addEventListener('click', (e) => {
-    if (!statusPickerEl) return;
-    if (statusPickerEl.contains(e.target)) return;
-    hideStatusPicker();
-  });
 }
 
 
@@ -530,10 +517,10 @@ function showStatusPicker(cell, rowIndex) {
 
   if (isBelow) {
     statusPickerEl.style.left = window.scrollX + rect.left + 'px';
-    statusPickerEl.style.top  = window.scrollY + rect.bottom + 4 + 'px';
+    statusPickerEl.style.top = window.scrollY + rect.bottom + 4 + 'px';
   } else {
     statusPickerEl.style.left = window.scrollX + rect.left + 'px';
-    statusPickerEl.style.top  = window.scrollY + rect.top - statusPickerEl.offsetHeight - 4 + 'px';
+    statusPickerEl.style.top = window.scrollY + rect.top - statusPickerEl.offsetHeight - 4 + 'px';
   }
 }
 
@@ -638,9 +625,9 @@ function initGuestModal() {
 
   // 人数行
   const labels = [
-    { key: 'male',   label: '男' },
+    { key: 'male', label: '男' },
     { key: 'female', label: '女' },
-    { key: 'child',  label: '子供' },
+    { key: 'child', label: '子供' },
     { key: 'infant', label: '幼児' }
   ];
 
@@ -758,9 +745,9 @@ function showGuestModal(rowIndex, noText, nameText, male, female, child, infant)
   guestNoEl.textContent = noText || '';
   guestNameEl.textContent = nameText || '';
 
-  guestCounts.male   = male   || 0;
+  guestCounts.male = male || 0;
   guestCounts.female = female || 0;
-  guestCounts.child  = child  || 0;
+  guestCounts.child = child || 0;
   guestCounts.infant = infant || 0;
 
   Object.keys(guestCountEls).forEach(key => {
@@ -795,7 +782,7 @@ async function applyGuestCounts(applyBtn) {
     console.error('人数更新エラー:', e);
     alert('人数の更新に失敗しました: ' + e.message);
   } finally {
-     if (applyBtn) {
+    if (applyBtn) {
       applyBtn.disabled = false;
     }
   }
@@ -848,7 +835,8 @@ async function saveDinnerToSheet(rowIndex, time) {
 
 
 // ==== 夕食ピッカー ====
-const DINNER_OPTIONS = ["17:30", "18:00", "18:30", "19:00", "19:30", "20:00"];
+// ==== 夕食ピッカー ====
+const DINNER_OPTIONS = ["", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"];
 // 夕食の現在値（行ごとの値）を保持してカウントに使う
 let currentDinnerValues = [];
 // 時間ごとの件数表示用の span を保持
@@ -881,7 +869,7 @@ function initDinnerPicker() {
     line.style.padding = '2px 0';
 
     const btn = document.createElement('div');
-    btn.textContent = t;
+    btn.textContent = t === "" ? "(空白)" : t;
     btn.style.fontSize = '1.4rem';
     btn.style.padding = '4px 8px';
     btn.style.cursor = 'pointer';
@@ -936,13 +924,6 @@ function initDinnerPicker() {
   dinnerPickerEl.appendChild(okBtn);
 
   document.body.appendChild(dinnerPickerEl);
-
-  // ピッカー外クリックで閉じる
-  document.addEventListener('click', (e) => {
-    if (!dinnerPickerEl) return;
-    if (dinnerPickerEl.contains(e.target)) return;
-    closeAllPickers();
-  });
 }
 // ==== 夕食ピッカーを閉じる ====
 function hideDinnerPicker() {
@@ -1000,10 +981,10 @@ function showDinnerPicker(cell, rowIndex, currentValue) {
 
   if (isBelow) {
     dinnerPickerEl.style.left = window.scrollX + rect.left + 'px';
-    dinnerPickerEl.style.top  = window.scrollY + rect.bottom + 4 + 'px';
+    dinnerPickerEl.style.top = window.scrollY + rect.bottom + 4 + 'px';
   } else {
     dinnerPickerEl.style.left = window.scrollX + rect.left + 'px';
-    dinnerPickerEl.style.top  = window.scrollY + rect.top - dinnerPickerEl.offsetHeight - 4 + 'px';
+    dinnerPickerEl.style.top = window.scrollY + rect.top - dinnerPickerEl.offsetHeight - 4 + 'px';
   }
 }
 
@@ -1030,7 +1011,8 @@ async function saveBreakfastToSheet(rowIndex, time) {
 
 
 // ==== 朝食ピッカー ====
-const BREAKFAST_OPTIONS = ["8:00", "8:30", "9:00", "弁当"];
+// ==== 朝食ピッカー ====
+const BREAKFAST_OPTIONS = ["", "8:00", "8:30", "9:00", "弁当"];
 
 let breakfastPickerEl = null;
 let currentBreakfastCell = null;
@@ -1050,7 +1032,7 @@ function initBreakfastPicker() {
 
   BREAKFAST_OPTIONS.forEach(t => {
     const btn = document.createElement('div');
-    btn.textContent = t;
+    btn.textContent = t === "" ? "(空白)" : t;
     btn.style.padding = '4px 8px';
     btn.style.fontSize = '1.4rem';
     btn.style.cursor = 'pointer';
@@ -1093,12 +1075,6 @@ function initBreakfastPicker() {
   breakfastPickerEl.appendChild(okBtn);
 
   document.body.appendChild(breakfastPickerEl);
-
-  document.addEventListener('click', (e) => {
-    if (!breakfastPickerEl) return;
-    if (breakfastPickerEl.contains(e.target)) return;
-    closeAllPickers();
-  });
 }
 
 function showBreakfastPicker(cell, rowIndex, currentValue) {
@@ -1118,10 +1094,10 @@ function showBreakfastPicker(cell, rowIndex, currentValue) {
 
   if (isBelow) {
     breakfastPickerEl.style.left = window.scrollX + rect.left + 'px';
-    breakfastPickerEl.style.top  = window.scrollY + rect.bottom + 4 + 'px';
+    breakfastPickerEl.style.top = window.scrollY + rect.bottom + 4 + 'px';
   } else {
     breakfastPickerEl.style.left = window.scrollX + rect.left + 'px';
-    breakfastPickerEl.style.top  = window.scrollY + rect.top - breakfastPickerEl.offsetHeight - 4 + 'px';
+    breakfastPickerEl.style.top = window.scrollY + rect.top - breakfastPickerEl.offsetHeight - 4 + 'px';
   }
 }
 
@@ -1138,7 +1114,7 @@ function hideBreakfastPicker() {
 async function saveNoteToSheet(rowIndex, text, colorKey) {
   try {
     const payload = JSON.stringify({
-      text:  text || '',
+      text: text || '',
       color: colorKey || 'black'
     });
 
@@ -1148,7 +1124,7 @@ async function saveNoteToSheet(rowIndex, text, colorKey) {
       body: JSON.stringify({
         date: currentSheetId,
         authKey: authKey,
-        row:  rowIndex,
+        row: rowIndex,
         note: payload
       })
     });
@@ -1208,7 +1184,7 @@ function initNoteEditor() {
   noteTextarea = document.createElement('textarea');
   noteTextarea.rows = 4;
   noteTextarea.style.width = '100%';
-  noteTextarea.style.fontSize = '20px'; 
+  noteTextarea.style.fontSize = '20px';
 
   // 色選択（黒・赤・青のラジオボタン）
   const colorWrapper = document.createElement('div');
@@ -1224,33 +1200,33 @@ function initNoteEditor() {
 
   noteColorRadioMap = {};
   ['black', 'red', 'blue'].forEach(colorKey => {
-  const label = document.createElement('label');
-  label.className = 'note-color-option';   // ★追加
+    const label = document.createElement('label');
+    label.className = 'note-color-option';   // ★追加
 
-  const radio = document.createElement('input');
-  radio.type = 'radio';
-  radio.name = 'noteColor';
-  radio.value = colorKey;
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'noteColor';
+    radio.value = colorKey;
 
-  const swatch = document.createElement('span');
-  swatch.className = 'note-color-label';   // ★追加
-  swatch.textContent =
-    colorKey === 'black' ? '黒' :
-    colorKey === 'red'   ? '赤' : '青';
-  swatch.style.color = NOTE_COLOR_MAP[colorKey];
+    const swatch = document.createElement('span');
+    swatch.className = 'note-color-label';   // ★追加
+    swatch.textContent =
+      colorKey === 'black' ? '黒' :
+        colorKey === 'red' ? '赤' : '青';
+    swatch.style.color = NOTE_COLOR_MAP[colorKey];
 
-  radio.addEventListener('change', () => {
-    if (radio.checked) {
-      currentNoteColor = colorKey;
-    }
+    radio.addEventListener('change', () => {
+      if (radio.checked) {
+        currentNoteColor = colorKey;
+      }
+    });
+
+    noteColorRadioMap[colorKey] = radio;
+
+    label.appendChild(radio);
+    label.appendChild(swatch);
+    colorWrapper.appendChild(label);
   });
-
-  noteColorRadioMap[colorKey] = radio;
-
-  label.appendChild(radio);
-  label.appendChild(swatch);
-  colorWrapper.appendChild(label);
-});
 
 
   // OK ボタン
@@ -1278,12 +1254,6 @@ function initNoteEditor() {
   noteEditorEl.appendChild(okBtn);
 
   document.body.appendChild(noteEditorEl);
-
-  document.addEventListener('click', (e) => {
-    if (!noteEditorEl) return;
-    if (noteEditorEl.contains(e.target)) return;
-    closeAllPickers();
-  });
 }
 
 
@@ -1308,15 +1278,15 @@ function showNoteEditor(cell, rowIndex, currentText, currentColorKey) {
 
   if (isBelow) {
     noteEditorEl.style.left = window.scrollX + rect.left - 200 + 'px';
-    noteEditorEl.style.top  = window.scrollY + rect.bottom + 4 + 'px';
+    noteEditorEl.style.top = window.scrollY + rect.bottom + 4 + 'px';
   } else {
     noteEditorEl.style.left = window.scrollX + rect.left - 200 + 'px';
-    noteEditorEl.style.top  = window.scrollY + rect.top - noteEditorEl.offsetHeight - 4 + 'px';
+    noteEditorEl.style.top = window.scrollY + rect.top - noteEditorEl.offsetHeight - 4 + 'px';
   }
 
   setTimeout(() => {
-  document.getElementById('Notetxt').focus();
-}, 50);
+    document.getElementById('Notetxt').focus();
+  }, 50);
 
 }
 
@@ -1369,12 +1339,6 @@ function initStaffPicker() {
   staffPickerEl.style.minWidth = '120px';
 
   document.body.appendChild(staffPickerEl);
-
-  document.addEventListener('click', (e) => {
-    if (!staffPickerEl) return;
-    if (staffPickerEl.contains(e.target)) return;
-    closeAllPickers();
-  });
 }
 
 function showStaffPicker(cell, rowIndex, currentValue) {
@@ -1387,6 +1351,22 @@ function showStaffPicker(cell, rowIndex, currentValue) {
 
   // 一旦中身クリア
   staffPickerEl.innerHTML = "";
+
+  // ★ (空白) ボタンを追加
+  const blankBtn = document.createElement('div');
+  blankBtn.textContent = '(空白)';
+  blankBtn.style.padding = '10px 8px';
+  blankBtn.style.cursor = 'pointer';
+  blankBtn.style.borderBottom = '1px solid #eee'; // 区切り線
+  blankBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (currentStaffCell && currentStaffRowIndex != null) {
+      currentStaffCell.textContent = "";
+      saveStaffToSheet(currentStaffRowIndex, "");
+    }
+    closeAllPickers();
+  });
+  staffPickerEl.appendChild(blankBtn);
 
   if (!staffOptions || staffOptions.length === 0) {
     const msg = document.createElement('div');
@@ -1421,10 +1401,10 @@ function showStaffPicker(cell, rowIndex, currentValue) {
 
   if (isBelow) {
     staffPickerEl.style.left = window.scrollX + rect.left + 'px';
-    staffPickerEl.style.top  = window.scrollY + rect.bottom + 4 + 'px';
+    staffPickerEl.style.top = window.scrollY + rect.bottom + 4 + 'px';
   } else {
     staffPickerEl.style.left = window.scrollX + rect.left + 'px';
-    staffPickerEl.style.top  = window.scrollY + rect.top - staffPickerEl.offsetHeight - 4 + 'px';
+    staffPickerEl.style.top = window.scrollY + rect.top - staffPickerEl.offsetHeight - 4 + 'px';
   }
 }
 
@@ -1485,9 +1465,9 @@ function initCarPicker() {
         currentCarCell.textContent = value;
 
         saveCarToSheet(currentCarRowIndex, value).catch(err => {
-            console.error('車の保存に失敗:', err);
-            alert('交通手段の保存に失敗しました');
-          });
+          console.error('車の保存に失敗:', err);
+          alert('交通手段の保存に失敗しました');
+        });
       }
       closeAllPickers();
     });
@@ -1496,13 +1476,6 @@ function initCarPicker() {
   });
 
   document.body.appendChild(carPickerEl);
-
-  // 外側クリックで閉じる
-  document.addEventListener('click', (e) => {
-    if (!carPickerEl) return;
-    if (carPickerEl.style.display === 'none') return;
-    if (!carPickerEl.contains(e.target)) closeAllPickers();
-  });
 }
 function showCarPicker(cell, rowIndex) {
   initCarPicker();
@@ -1530,10 +1503,10 @@ function showCarPicker(cell, rowIndex) {
 
   if (isBelow) {
     carPickerEl.style.left = (window.scrollX + rect.left - 100) + 'px';
-    carPickerEl.style.top  = (window.scrollY + rect.bottom + 4) + 'px';
+    carPickerEl.style.top = (window.scrollY + rect.bottom + 4) + 'px';
   } else {
     carPickerEl.style.left = (window.scrollX + rect.left - 100) + 'px';
-    carPickerEl.style.top  = (window.scrollY + rect.top - carPickerEl.offsetHeight - 4) + 'px';
+    carPickerEl.style.top = (window.scrollY + rect.top - carPickerEl.offsetHeight - 4) + 'px';
   }
 }
 function hideCarPicker() {
@@ -1558,7 +1531,7 @@ async function saveCarToSheet(rowIndex, value) {
     console.error(json);
     alert(json.message || '車の保存に失敗しました');
   }
-  
+
 }
 
 
@@ -1655,7 +1628,7 @@ function initDateNavigation() {
 
 function changeCurrentDateByDays(delta) {
   currentDate.setDate(currentDate.getDate() + delta);
-  
+
   tableContainer.innerHTML = '';
   statusSpan.textContent = '読み込み中…';
   statusSpan.style.display = 'inline';
@@ -1667,7 +1640,7 @@ window.addEventListener('DOMContentLoaded', () => {
   currentDate = new Date();   // 今日
   initDateNavigation();       // ヘッダーに type=date＋ボタンをセット
   initPickerCloseGuard();
-  
+
   statusSpan.textContent = '読み込み中…';
   statusSpan.style.display = 'inline';
   loadForCurrentDate();       //  自動で今日のシートを読み込む
@@ -1710,7 +1683,7 @@ function initPickerOverlay() {
   pickerOverlayEl.style.display = 'none';
 
   // ★ ウィンドウ外タップで「保存せずに閉じる」(= closeAllPickers)
-  pickerOverlayEl.addEventListener('pointerdown', (e) => {
+  pickerOverlayEl.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
@@ -1777,14 +1750,14 @@ async function fetchAndRender(sheetId) {
 
 
 function handleFetchedData(json) {
-  const data          = json.data;
-  const colors        = json.colors      || [];
-  const statuses      = json.statuses    || [];
-  const dinnersRaw    = json.dinners     || [];
-  const breakfastsRaw = json.breakfasts  || [];
-  const notesRaw      = json.notes       || [];
-  const staffList     = json.staffList   || [];
-  const staffValues   = json.staffValues || [];
+  const data = json.data;
+  const colors = json.colors || [];
+  const statuses = json.statuses || [];
+  const dinnersRaw = json.dinners || [];
+  const breakfastsRaw = json.breakfasts || [];
+  const notesRaw = json.notes || [];
+  const staffList = json.staffList || [];
+  const staffValues = json.staffValues || [];
 
   // データが無い場合（=シートが無い/空）はメッセージだけ表示して終了
   if (!data || data.length === 0) {
@@ -1795,12 +1768,12 @@ function handleFetchedData(json) {
   }
 
   // 夕食・朝食
-  const dinners    = dinnersRaw.map(normalizeTimeValue);
+  const dinners = dinnersRaw.map(normalizeTimeValue);
   const breakfasts = breakfastsRaw.map(normalizeTimeValue);
   currentDinnerValues = dinners.slice();
 
   // 連絡事項
-  const noteTexts  = [];
+  const noteTexts = [];
   const noteColors = [];
   notesRaw.forEach(v => {
     const parsed = parseNoteCell(v);
@@ -1811,8 +1784,8 @@ function handleFetchedData(json) {
   // 客室係リスト
   staffOptions = staffList.slice();
 
-  const withNights  = convertNightsFormat(data);
-  const withNo      = transformNoColumn(withNights);
+  const withNights = convertNightsFormat(data);
+  const withNo = transformNoColumn(withNights);
   const finalMatrix = addExtraColumns(withNo);
 
   renderTable(finalMatrix, colors, statuses, dinners, breakfasts, noteTexts, noteColors, staffValues);
@@ -1986,7 +1959,7 @@ function addExtraColumns(matrix) {
   const header = matrix[0];
 
   const idxProduct = header.indexOf("商品名");
-  const idxMemo    = header.indexOf("MEMO");
+  const idxMemo = header.indexOf("MEMO");
 
   if (idxProduct === -1 || idxMemo === -1) {
     alert("商品名または MEMO の列が見つかりません。ヘッダー名を確認してください。");
@@ -1997,7 +1970,7 @@ function addExtraColumns(matrix) {
     // 左端に空白列追加（ステータス列）
     row = ["", ...row];
 
-    const newIdxMemo    = idxMemo + 1;
+    const newIdxMemo = idxMemo + 1;
     const idxDinner = 9; //夕食列10列目
 
     // 夕食の右に 3 列追加
@@ -2046,22 +2019,22 @@ function renderTable(
 
   // 各列インデックス
   const header = matrix[0];
-  let noColIndex       = header.indexOf("No");
-  let nameColIndex     = header.indexOf("氏名");
-  const maleColIndex      = header.indexOf("男");
-  const femaleColIndex    = header.indexOf("女");
-  const childColIndex     = header.indexOf("子供");
-  const infantColIndex    = header.indexOf("幼児");
-  const nightsColIndex    = header.indexOf("泊数");
-  const stayplanColIndex  = header.indexOf("商品名");
-  const staffColIndex     = header.indexOf("客室係");
-  const dinnerColIndex    = header.indexOf("夕食時間");
+  let noColIndex = header.indexOf("No");
+  let nameColIndex = header.indexOf("氏名");
+  const maleColIndex = header.indexOf("男");
+  const femaleColIndex = header.indexOf("女");
+  const childColIndex = header.indexOf("子供");
+  const infantColIndex = header.indexOf("幼児");
+  const nightsColIndex = header.indexOf("泊数");
+  const stayplanColIndex = header.indexOf("商品名");
+  const staffColIndex = header.indexOf("客室係");
+  const dinnerColIndex = header.indexOf("夕食時間");
   const breakfastColIndex = header.indexOf("朝食時間");
-  const noteColIndex      = header.indexOf("連絡事項");
-  const carColIndex       = header.indexOf("車");
+  const noteColIndex = header.indexOf("連絡事項");
+  const carColIndex = header.indexOf("車");
 
 
-  if (noColIndex === -1)   noColIndex = 1; // 0:ステータス,1:No
+  if (noColIndex === -1) noColIndex = 1; // 0:ステータス,1:No
   if (nameColIndex === -1) nameColIndex = 2; // 2:氏名
 
   const tbody = document.createElement("tbody");
@@ -2071,21 +2044,21 @@ function renderTable(
 
     const sheetRowIndex = r + 1; // シート上の行番号（ヘッダーが1行目）
 
-    const rowColor      = rowColors[r - 1]      || '';
-    const rowStatus     = rowStatuses[r - 1]    || '';
-    const rowDinner     = rowDinners[r - 1]     || '';
-    const rowBreakfast  = rowBreakfasts[r - 1]  || '';
-    const rowNoteText   = rowNotes[r - 1]       || '';
-    const rowNoteColor  = rowNoteColors[r - 1]  || 'black';
-    const rowStaff      = rowStaffs[r - 1]      || '';
+    const rowColor = rowColors[r - 1] || '';
+    const rowStatus = rowStatuses[r - 1] || '';
+    const rowDinner = rowDinners[r - 1] || '';
+    const rowBreakfast = rowBreakfasts[r - 1] || '';
+    const rowNoteText = rowNotes[r - 1] || '';
+    const rowNoteColor = rowNoteColors[r - 1] || 'black';
+    const rowStaff = rowStaffs[r - 1] || '';
 
     // この行の No / 氏名 / 各人数（元データから）
-    const rowData   = matrix[r];
-    const rowNoText   = String(rowData[noColIndex]   ?? '');
+    const rowData = matrix[r];
+    const rowNoText = String(rowData[noColIndex] ?? '');
     const rowNameText = String(rowData[nameColIndex] ?? '');
-    const rowMale   = (maleColIndex   !== -1 && rowData[maleColIndex])   ? Number(rowData[maleColIndex])   || 0 : 0;
+    const rowMale = (maleColIndex !== -1 && rowData[maleColIndex]) ? Number(rowData[maleColIndex]) || 0 : 0;
     const rowFemale = (femaleColIndex !== -1 && rowData[femaleColIndex]) ? Number(rowData[femaleColIndex]) || 0 : 0;
-    const rowChild  = (childColIndex  !== -1 && rowData[childColIndex])  ? Number(rowData[childColIndex])  || 0 : 0;
+    const rowChild = (childColIndex !== -1 && rowData[childColIndex]) ? Number(rowData[childColIndex]) || 0 : 0;
     const rowInfant = (infantColIndex !== -1 && rowData[infantColIndex]) ? Number(rowData[infantColIndex]) || 0 : 0;
 
     // C/I 行の背景色を反映（No/氏名のセル色はこの上に重ねる）
@@ -2130,9 +2103,9 @@ function renderTable(
 
       // 男・女・子供・幼児 → 人数変更モーダル
       const isGuestCol =
-        (maleColIndex   !== -1 && cIndex === maleColIndex) ||
+        (maleColIndex !== -1 && cIndex === maleColIndex) ||
         (femaleColIndex !== -1 && cIndex === femaleColIndex) ||
-        (childColIndex  !== -1 && cIndex === childColIndex) ||
+        (childColIndex !== -1 && cIndex === childColIndex) ||
         (infantColIndex !== -1 && cIndex === infantColIndex);
 
       if (isGuestCol) {
@@ -2241,8 +2214,8 @@ function renderTable(
 // =======================
 function escapeHtml(str) {
   return str.replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#39;");
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
