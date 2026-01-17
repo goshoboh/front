@@ -381,7 +381,7 @@ function initColorPicker() {
         saveColorToSheet(currentRowIndexForColor, appliedColor);
       }
 
-      hideColorPicker();
+      closeAllPickers();
     });
 
     colorPickerEl.appendChild(swatch);
@@ -393,7 +393,7 @@ function initColorPicker() {
   document.addEventListener('click', (e) => {
     if (!colorPickerEl) return;
     if (colorPickerEl.contains(e.target)) return;
-    hideColorPicker();
+    closeAllPickers();
   });
 }
 
@@ -401,6 +401,7 @@ function initColorPicker() {
 
 function showColorPicker(cell, rowIndex) {
   initColorPicker();
+  closeAllPickers();
   showPickerOverlay();
   highlightRowFromCell(cell);
   currentRowIndexForColor = rowIndex;
@@ -487,7 +488,8 @@ function initStatusPicker() {
           saveStatusToSheet(currentStatusRowIndex, st);
         }
       }
-      hideStatusPicker();
+      closeAllPickers();
+
     });
 
     statusPickerEl.appendChild(btn);
@@ -516,6 +518,7 @@ function updateRowStatusBackground(tr, status) {
 
 function showStatusPicker(cell, rowIndex) {
   initStatusPicker();
+  closeAllPickers();
   showPickerOverlay();
   highlightRowFromCell(cell);
   currentStatusTarget = cell;
@@ -897,7 +900,7 @@ function initDinnerPicker() {
         currentDinnerCell.textContent = t;
         saveDinnerToSheet(currentDinnerRowIndex, t);
       }
-      hideDinnerPicker(); // ★ 必ず閉じる
+      closeAllPickers();
     });
 
     line.appendChild(btn);
@@ -926,7 +929,7 @@ function initDinnerPicker() {
       currentDinnerCell.textContent = val;
       saveDinnerToSheet(currentDinnerRowIndex, val);
     }
-    hideDinnerPicker(); // ★ 必ず閉じる
+    closeAllPickers();
   });
 
   dinnerPickerEl.appendChild(input);
@@ -938,7 +941,7 @@ function initDinnerPicker() {
   document.addEventListener('click', (e) => {
     if (!dinnerPickerEl) return;
     if (dinnerPickerEl.contains(e.target)) return;
-    hideDinnerPicker();
+    closeAllPickers();
   });
 }
 // ==== 夕食ピッカーを閉じる ====
@@ -980,6 +983,7 @@ function updateDinnerCounts() {
 
 function showDinnerPicker(cell, rowIndex, currentValue) {
   initDinnerPicker();
+  closeAllPickers();
   showPickerOverlay();
   highlightRowFromCell(cell);
   currentDinnerCell = cell;
@@ -1056,7 +1060,7 @@ function initBreakfastPicker() {
         currentBreakfastCell.textContent = t;
         saveBreakfastToSheet(currentBreakfastRowIndex, t);
       }
-      hideBreakfastPicker();
+      closeAllPickers();
     });
 
     breakfastPickerEl.appendChild(btn);
@@ -1082,7 +1086,7 @@ function initBreakfastPicker() {
       currentBreakfastCell.textContent = val;
       saveBreakfastToSheet(currentBreakfastRowIndex, val);
     }
-    hideBreakfastPicker();
+    closeAllPickers();
   });
 
   breakfastPickerEl.appendChild(input);
@@ -1093,12 +1097,13 @@ function initBreakfastPicker() {
   document.addEventListener('click', (e) => {
     if (!breakfastPickerEl) return;
     if (breakfastPickerEl.contains(e.target)) return;
-    hideBreakfastPicker();
+    closeAllPickers();
   });
 }
 
 function showBreakfastPicker(cell, rowIndex, currentValue) {
   initBreakfastPicker();
+  closeAllPickers();
   showPickerOverlay();
   highlightRowFromCell(cell);
   currentBreakfastCell = cell;
@@ -1265,7 +1270,7 @@ function initNoteEditor() {
       // テキストと色を Y列に JSON 文字列として保存
       saveNoteToSheet(currentNoteRowIndex, val, currentNoteColor);
     }
-    hideNoteEditor();
+    closeAllPickers();
   });
 
   noteEditorEl.appendChild(noteTextarea);
@@ -1277,13 +1282,14 @@ function initNoteEditor() {
   document.addEventListener('click', (e) => {
     if (!noteEditorEl) return;
     if (noteEditorEl.contains(e.target)) return;
-    hideNoteEditor();
+    closeAllPickers();
   });
 }
 
 
 function showNoteEditor(cell, rowIndex, currentText, currentColorKey) {
   initNoteEditor();
+  closeAllPickers();
   showPickerOverlay();
   highlightRowFromCell(cell);
   currentNoteCell = cell;
@@ -1367,12 +1373,13 @@ function initStaffPicker() {
   document.addEventListener('click', (e) => {
     if (!staffPickerEl) return;
     if (staffPickerEl.contains(e.target)) return;
-    hideStaffPicker();
+    closeAllPickers();
   });
 }
 
 function showStaffPicker(cell, rowIndex, currentValue) {
   initStaffPicker();
+  closeAllPickers();
   showPickerOverlay();
   highlightRowFromCell(cell);
   currentStaffCell = cell;
@@ -1401,7 +1408,7 @@ function showStaffPicker(cell, rowIndex, currentValue) {
           currentStaffCell.textContent = name;
           saveStaffToSheet(currentStaffRowIndex, name);
         }
-        hideStaffPicker();
+        closeAllPickers();
       });
       staffPickerEl.appendChild(btn);
     });
@@ -1476,9 +1483,13 @@ function initCarPicker() {
       const value = v; // '' はクリア
       if (currentCarCell && currentCarRowIndex != null) {
         currentCarCell.textContent = value;
-        await saveCarToSheet(currentCarRowIndex, value);
+
+        saveCarToSheet(currentCarRowIndex, value).catch(err => {
+            console.error('車の保存に失敗:', err);
+            alert('交通手段の保存に失敗しました');
+          });
       }
-      hideCarPicker();
+      closeAllPickers();
     });
 
     carPickerEl.appendChild(btn);
@@ -1490,11 +1501,12 @@ function initCarPicker() {
   document.addEventListener('click', (e) => {
     if (!carPickerEl) return;
     if (carPickerEl.style.display === 'none') return;
-    if (!carPickerEl.contains(e.target)) hideCarPicker();
+    if (!carPickerEl.contains(e.target)) closeAllPickers();
   });
 }
 function showCarPicker(cell, rowIndex) {
   initCarPicker();
+  closeAllPickers();
   showPickerOverlay();
   highlightRowFromCell(cell);
 
@@ -1551,35 +1563,20 @@ async function saveCarToSheet(rowIndex, value) {
 
 
 function initPickerCloseGuard() {
-  // captureフェーズで先に拾って「閉じる」を優先する
-  document.addEventListener('pointerdown', (e) => {
-    // ピッカーが開いていなければ何もしない
-    if (!isAnyPickerOpen()) return;
-
-    // ピッカー内のクリックは許可（操作できるように）
-    const insidePicker = e.target.closest('.picker');
-    if (insidePicker) return;
-
-    // ピッカー外を押した → まず閉じる。そのクリックで他のピッカーを開かせない
-    closeAllPickers();
-
-    e.preventDefault();
-    e.stopPropagation();
-    if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
-  }, true);
+  return;
 }
 
 
 // ==== すべてのピッカーを閉じる ====
 function closeAllPickers() {
-  if (colorPickerEl)      colorPickerEl.style.display = 'none';
-  if (statusPickerEl)     statusPickerEl.style.display = 'none';
-  if (staffPickerEl)      staffPickerEl.style.display = 'none';
-  if (dinnerPickerEl)     dinnerPickerEl.style.display = 'none';
-  if (breakfastPickerEl)  breakfastPickerEl.style.display = 'none';
-  if (noteEditorEl)       noteEditorEl.style.display = 'none';
-  if (carPickerEl)        carPickerEl.style.display = 'none';
-  
+  hideColorPicker?.();
+  hideStatusPicker?.();
+  hideStaffPicker?.();
+  hideDinnerPicker?.();
+  hideBreakfastPicker?.();
+  hideNoteEditor?.();
+  hideCarPicker?.();
+
   hidePickerOverlay();
   clearRowHighlight();
 }
@@ -1708,19 +1705,21 @@ function initPickerOverlay() {
   pickerOverlayEl.id = 'pickerOverlay';
   pickerOverlayEl.style.position = 'fixed';
   pickerOverlayEl.style.inset = '0';
-  pickerOverlayEl.style.background = 'transparent'; // 暗くしたければ rgba(0,0,0,0.15)
-  pickerOverlayEl.style.zIndex = '9000'; // ピッカーより下、テーブルより上
+  pickerOverlayEl.style.background = 'transparent';
+  pickerOverlayEl.style.zIndex = '9000';
   pickerOverlayEl.style.display = 'none';
 
-  // オーバーレイタップで閉じる
-  pickerOverlayEl.addEventListener('click', (e) => {
+  // ★ ウィンドウ外タップで「保存せずに閉じる」(= closeAllPickers)
+  pickerOverlayEl.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     e.stopPropagation();
+    if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
     closeAllPickers();
   });
 
   document.body.appendChild(pickerOverlayEl);
 }
+
 function showPickerOverlay() {
   initPickerOverlay();
   pickerOverlayEl.style.display = 'block';
