@@ -117,6 +117,14 @@ table td:nth-child(3) {
   font-size: 1.1rem;
 }
 
+
+table td:nth-child(4),
+table td:nth-child(5),
+table td:nth-child(6),
+table td:nth-child(7){
+  text-align: center;
+}
+
 /* 商品名 */
 table td:nth-child(9) {
   padding: 2px;
