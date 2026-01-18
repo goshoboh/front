@@ -1239,9 +1239,13 @@ function initNoteEditor() {
   okBtn.addEventListener('click', () => {
     const val = noteTextarea.value.trim();
     if (currentNoteCell && currentNoteRowIndex != null) {
-      currentNoteCell.textContent = val;
+      // 改行を反映して表示
+      currentNoteCell.innerHTML = escapeHtml(val).replace(/\n/g, '<br>');
       currentNoteCell.style.color =
         NOTE_COLOR_MAP[currentNoteColor] || NOTE_COLOR_MAP.black;
+
+      // 次回参照用にデータ属性も更新
+      currentNoteCell.dataset.noteColor = currentNoteColor;
 
       // テキストと色を Y列に JSON 文字列として保存
       saveNoteToSheet(currentNoteRowIndex, val, currentNoteColor);
@@ -2168,9 +2172,13 @@ function renderTable(
         td.style.color =
           NOTE_COLOR_MAP[rowNoteColor] || NOTE_COLOR_MAP.black;
 
+        td.dataset.noteColor = rowNoteColor || 'black';
+
         td.addEventListener('click', (event) => {
           event.stopPropagation();
-          showNoteEditor(td, sheetRowIndex, rowNoteText || "", rowNoteColor || "black");
+          const currentText = td.innerText;
+          const currentColor = td.dataset.noteColor || 'black';
+          showNoteEditor(td, sheetRowIndex, currentText, currentColor);
         });
       }
 
