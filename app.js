@@ -312,7 +312,7 @@ const COLOR_OPTIONS = [
   '#20def7ff',
   '#bdbdbdff'
 ];
-const CI_ROW_BG = '#dceeddff'; // C/Iの薄いグリーン
+const CI_ROW_BG = 'rgb(219, 241, 220)'; // C/Iの薄いグリーン
 let colorPickerEl = null;
 let currentRowIndexForColor = null; // どの行の色か（シート行番号）
 
@@ -1446,7 +1446,7 @@ function initCarPicker() {
   title.style.background = '#f7f7f7';
   carPickerEl.appendChild(title);
 
-  const options = ['車', '電車', 'バス', 'ロープウェー', '']; // 空白も入れる（クリア用）
+  const options = ['車', '電車', '阪急バス', '太閤橋', 'ロープウェー', '']; // 空白も入れる（クリア用）
 
   options.forEach(v => {
     const btn = document.createElement('div');
@@ -2219,4 +2219,3 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
-

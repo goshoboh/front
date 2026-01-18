@@ -181,7 +181,7 @@ table td:nth-child(16) {
 
 /* 交通手段 */
 table td:nth-child(17) {
-  max-width: 55px;
+  max-width: 45px;
   padding: 4px;
   font-size: 0.6em;
 }
