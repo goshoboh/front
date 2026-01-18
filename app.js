@@ -442,7 +442,7 @@ async function saveColorToSheet(rowIndex, color) {
 // =======================
 // ステータスピッカー（1列目）
 // =======================
-const STATUS_OPTIONS = ["", "荷", "荷,P", "C/I"];
+const STATUS_OPTIONS = ["", "荷", "荷,届", "C/I"];
 
 let statusPickerEl = null;
 let currentStatusTarget = null;
@@ -2219,3 +2219,4 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
+
