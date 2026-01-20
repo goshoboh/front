@@ -1,5 +1,6 @@
 // ===== GAS API URL =====
 const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwcRDMfcPWb205wkYWv1f8lanZeKGW5dVW0_8k48EYWqu2dmuwFjOVU8UPue-wg-QTVSw/exec';
+const CLEANING_API_URL = 'https://script.google.com/macros/s/AKfycbxsxzYRcAGxp3CjwYsBj6cQcI8xmw5WGzYmgYHNYy3JClCsLcdjoj_TG8A1BJnAUG59/exec';
 
 // ==== 簡易認証（ローカルストレージ） ====
 const LOCAL_STORAGE_AUTH_KEY = 'sheetAuthKey';
@@ -1830,6 +1831,8 @@ async function authWithKeywordAndFetch(sheetId) {
     if (ok) {
       statusSpan.textContent = '';
       statusSpan.style.display = 'none';
+      // ★ 清掃状況を読み込んで反映
+      loadCleaningStatus().catch(err => console.error(err));
     }
     // シートがない場合は handleFetchedData がメッセージを表示している
     return ok;
@@ -1864,6 +1867,8 @@ async function fetchWithKey(sheetId) {
       // データがあるときだけステータスクリア
       statusSpan.textContent = '';
       statusSpan.style.display = 'none';
+      // ★ 清掃状況を読み込んで反映
+      loadCleaningStatus().catch(err => console.error(err));
     }
     // シートがないときは handleFetchedData がメッセージを出している
     return ok;
@@ -2226,4 +2231,92 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+// =======================
+// 清掃済み状況の読み込み
+// =======================
+async function loadCleaningStatus() {
+  // ★ 本日の日付のときのみ実行する
+  const todayId = dateToSheetId(new Date());
+  if (currentSheetId !== todayId) {
+    return;
+  }
+
+  try {
+    // 清掃状況専用の GAS API に対して action: 'getCleaningStatus' を POST する
+    const res = await fetch(CLEANING_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'getCleaningStatus',
+        // authKey: authKey // こちらのAPIに認証が必要なければ不要だが、念のため残すか、不要なら削除
+      })
+    });
+
+    const json = await res.json();
+    if (json.success && Array.isArray(json.data)) {
+      applyCleaningStatus(json.data);
+    } else {
+      console.warn('清掃状況の取得に失敗、またはデータ形式が不正です', json);
+    }
+
+  } catch (e) {
+    console.error('清掃状況読み込みエラー:', e);
+  }
+}
+
+// =======================
+// 清掃状況をテーブルに反映
+// =======================
+function applyCleaningStatus(data) {
+  // data: [[RoomNo, Flag1, Flag2, Flag3], ...] の配列 (C2:F18)
+  // Flag1~3 (D,E,F列) がすべて TRUE なら「清掃済み」
+
+  // 1. 清掃済みの部屋番号リストを作成
+  const cleanedRooms = new Set();
+
+  data.forEach(row => {
+    // 行データが足りない場合はスキップ
+    if (!Array.isArray(row) || row.length < 4) return;
+
+    const roomNo = String(row[0]).trim(); // C列
+    const d = row[1]; // D列
+    const e = row[2]; // E列
+    const f = row[3]; // F列
+
+    // 3つとも TRUE (boolean true または 文字列 "TRUE") の場合
+    if (isTrue(d) && isTrue(e) && isTrue(f)) {
+      cleanedRooms.add(roomNo);
+    }
+  });
+
+  // 2. HTML上のテーブル行を探して反映
+  // テーブルの構造: 1列目=ステータス(index 0), 2列目=No(index 1) ※通常設定の場合
+  // renderTable で noColIndex を特定しているが、ここでは DOM から推定する
+
+  const tbody = document.querySelector('#tableContainer table tbody');
+  if (!tbody) return;
+
+  const trs = tbody.querySelectorAll('tr');
+  trs.forEach(tr => {
+    const tds = tr.querySelectorAll('td');
+    if (tds.length < 2) return;
+
+    // 2列目 (index 1) のテキストを部屋番号として判定
+    const cellNo = tds[1].textContent.trim();
+
+    if (cleanedRooms.has(cellNo)) {
+      // 一致したら 1列目 の背景を blue に
+      if (tds[0]) {
+        tds[0].style.backgroundColor = 'rgb(219, 241, 220)';
+      }
+    }
+  });
+}
+
+function isTrue(val) {
+  if (val === true) return true;
+  if (typeof val === 'string' && val.toUpperCase() === 'TRUE') return true;
+  return false;
 }
