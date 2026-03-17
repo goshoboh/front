@@ -2307,9 +2307,9 @@ function applyCleaningStatus(data) {
     const cellNo = tds[1].textContent.trim();
 
     if (cleanedRooms.has(cellNo)) {
-      // 一致したら 1列目 の背景を blue に
+      // 一致したら 1列目 の背景を変更
       if (tds[0]) {
-        tds[0].style.backgroundColor = 'rgb(219, 241, 220)';
+        tds[0].style.background = 'linear-gradient(to right, #21ed69 15%, transparent 15%)';
       }
     }
   });
