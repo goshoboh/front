@@ -2309,7 +2309,7 @@ function applyCleaningStatus(data) {
     if (cleanedRooms.has(cellNo)) {
       // 一致したら 1列目 の背景を変更
       if (tds[0]) {
-        tds[0].style.background = 'linear-gradient(to right, #21ed69 15%, transparent 15%)';
+        tds[0].style.background = 'linear-gradient(to right, #dbf1dc 15%, transparent 15%)';
       }
     }
   });
