@@ -414,3 +414,67 @@ td.no-cell {
   background: color-mix(in srgb, currentColor 12%, transparent);
   font-weight: bold;
 }
+
+
+/* スマホ用 */
+@media (max-width: 768px) {
+
+  .header-right,
+  table th:nth-child(1), table td:nth-child(1),
+  table th:nth-child(10), table td:nth-child(10),
+  table th:nth-child(11), table td:nth-child(11),
+  table th:nth-child(14), table td:nth-child(14),
+  table th:nth-child(16), table td:nth-child(16),
+  table th:nth-child(17), table td:nth-child(17){
+    display: none;
+  }
+
+  table td{
+    font-size: 0.7rem;
+    padding: 4px 2px;
+  }
+
+  .table-container{
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  table th:nth-child(2), table td:nth-child(2){
+    position: sticky;
+    left: 0;
+    background-color: #fff; 
+    z-index: 1;
+  }
+
+  
+  table td:nth-child(6),
+  table td:nth-child(7){
+    width: 20px;           /* 1文字分の幅 */
+    white-space: nowrap;  /* 改行させない */
+    overflow: hidden;     /* はみ出た文字を隠す */
+    text-overflow: clip;  /* 三点リーダー(...)を出さない */
+  }
+  
+  table th:nth-child(6),
+  table th:nth-child(7){
+    font-size: 0.4rem;
+  }
+
+  table td:nth-child(12),table td:nth-child(13){
+    width: 50px;
+  }
+  table td:nth-child(3),
+  table td:nth-child(12),
+  table td:nth-child(13){
+    font-size: 0.8rem;
+  }
+
+  #dateInput, .daybtn{
+    font-size: 0.8rem;
+  }
+
+  table {
+    pointer-events: none; /* クリックやタップに反応しなくなります */
+    user-select: none;    /* テキスト選択も不可にする場合 */
+  }
+
+}
