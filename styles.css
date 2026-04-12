@@ -116,13 +116,13 @@ td {
 }
 
 td.col-no.cleanup::before {
-  content: "✔";
+  content: "\2714\FE0E";
   position: absolute;
   top: 2px;
   left: 2px;
   background-color: #48dd59;
   color: rgb(255,255,255);
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   padding: 4px;
   border-radius: 99px;
   line-height: 1;
