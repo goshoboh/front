@@ -120,8 +120,8 @@ td.col-no.cleanup::before {
   position: absolute;
   top: 2px;
   left: 2px;
-  background-color: #3bb54a;
-  color: #fff;
+  background-color: #48dd59;
+  color: rgb(255,255,255);
   font-size: 0.65rem;
   padding: 4px;
   border-radius: 99px;
@@ -130,7 +130,7 @@ td.col-no.cleanup::before {
 
 /* チェックイン完了時(status-ci付与時)は非表示 */
 tr.status-ci td.col-no.cleanup::before {
-  display: none;
+  background-color: #a9d8ae;
 }
 
 .col-name {
