@@ -102,41 +102,55 @@ td {
   font-size: 0.85rem;
 }
 
-.cleanup {
-  background: #dbf1dc;
-}
+/* ----- 以前の背景色指定(.cleanup)は廃止 ----- */
 
-table td:nth-child(1) {
+.col-status {
   min-width: 35px;
   padding: 4px 2px;
   text-align: center;
 }
 
-table td:nth-child(2) {
+.col-no {
   text-align: center;
+  position: relative;
 }
 
-table td:nth-child(3) {
+td.col-no.cleanup::before {
+  content: "✔";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  background-color: #3bb54a;
+  color: #fff;
+  font-size: 0.65rem;
+  padding: 4px;
+  border-radius: 99px;
+  line-height: 1;
+}
+
+/* チェックイン完了時(status-ci付与時)は非表示 */
+tr.status-ci td.col-no.cleanup::before {
+  display: none;
+}
+
+.col-name {
   font-weight: bold;
   font-size: 1.1rem;
 }
 
 
-table td:nth-child(4),
-table td:nth-child(5),
-table td:nth-child(6),
-table td:nth-child(7){
+.col-guest {
   text-align: center;
 }
 
 /* 商品名 */
-table td:nth-child(9) {
+.col-product {
   padding: 2px;
   max-width: 90px;
 }
 
 /* 夕食 */
-table td:nth-child(10) {
+.col-dinner {
   font-size: 0.7em;
   padding: 2px;
   width: auto;
@@ -144,19 +158,19 @@ table td:nth-child(10) {
 }
 
 /* 客室係列 */
-table th:nth-child(11),
-table td:nth-child(11) {
+th.col-staff,
+td.col-staff {
   font-size: 12px;
   padding: 2px;
   text-align: center;
 }
 
 /* 夕食時間列 */
-table th:nth-child(12) {
+th.col-dinner-time {
   
   border-left: #c2c2c2 solid 2px;
 }
-table td:nth-child(12) {
+td.col-dinner-time {
   min-width: 53px;
   border-left: #c2c2c2 solid 2px;
   color: red;
@@ -165,10 +179,10 @@ table td:nth-child(12) {
 }
 
 /* 朝食 */
-table th:nth-child(13){
+th.col-breakfast-time {
   border-right: #c2c2c2 solid 2px;
 }
-table td:nth-child(13) {
+td.col-breakfast-time {
   min-width: 53px;
   color: red;
   font-weight: bold;
@@ -177,17 +191,46 @@ table td:nth-child(13) {
   border-right: #c2c2c2 solid 2px;
 }
 
-table td:nth-child(16) {
+table td.col-15 {
   padding: 4px;
   color: rgb(4, 0, 255);
   font-weight: bold;
 }
 
 /* 交通手段 */
-table td:nth-child(17) {
+.col-car {
   max-width: 45px;
   padding: 4px;
   font-size: 0.6em;
+}
+
+/* --- JSから移行されたスタイル --- */
+.clickable-cell {
+  cursor: pointer;
+}
+
+tr.status-ci {
+  background-color: rgb(219, 241, 220);
+}
+
+.name-suffix {
+  font-size: 0.6em;
+  font-weight: 400;
+}
+
+td[data-note-color="black"], 
+.note-color-label[data-color="black"] {
+  color: #000000;
+}
+
+td[data-note-color="red"], 
+.note-color-label[data-color="red"] {
+  color: #ff0000ff;
+}
+
+td[data-note-color="blue"], 
+.note-color-label[data-color="blue"] {
+  color: #0026ffff;
 }
 
 /* ===== 人数変更モーダル全体 ===== */
@@ -417,4 +460,73 @@ td.no-cell {
   border-color: currentColor;
   background: color-mix(in srgb, currentColor 12%, transparent);
   font-weight: bold;
+}
+
+
+
+/* スマホ用 */
+@media (max-width: 768px) {
+
+  .header-right,
+  table th:nth-child(1), table td:nth-child(1),
+  table th:nth-child(10), table td:nth-child(10),
+  table th:nth-child(11), table td:nth-child(11),
+  table th:nth-child(14), table td:nth-child(14),
+  table th:nth-child(16), table td:nth-child(16),
+  table th:nth-child(17), table td:nth-child(17){
+    display: none;
+  }
+
+  table td{
+    font-size: 0.7rem;
+    padding: 4px 2px;
+  }
+
+  .table-container{
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  table th:nth-child(2), table td:nth-child(2){
+    position: sticky;
+    left: 0;
+    background-color: #fff; 
+    z-index: 1;
+  }
+
+  
+  table td:nth-child(6),
+  table td:nth-child(7){
+    width: 20px;           /* 1文字分の幅 */
+    white-space: nowrap;  /* 改行させない */
+    overflow: hidden;     /* はみ出た文字を隠す */
+    text-overflow: clip;  /* 三点リーダー(...)を出さない */
+  }
+  
+  table th:nth-child(6),
+  table th:nth-child(7){
+    font-size: 0.4rem;
+  }
+
+  table td:nth-child(12),table td:nth-child(13){
+    width: 50px;
+  }
+  table td:nth-child(3),
+  table td:nth-child(12),
+  table td:nth-child(13){
+    font-size: 0.8rem;
+  }
+
+  #dateInput, .daybtn{
+    font-size: 0.8rem;
+  }
+
+  table {
+    pointer-events: none; /* クリックやタップに反応しなくなります */
+    user-select: none;    /* テキスト選択も不可にする場合 */
+  }
+
+  td.col-no.cleanup::before {
+  display: none;
+}
+
 }

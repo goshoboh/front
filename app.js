@@ -313,7 +313,6 @@ const COLOR_OPTIONS = [
   '#20def7ff',
   '#bdbdbdff'
 ];
-const CI_ROW_BG = 'rgb(219, 241, 220)'; // C/Iの薄いグリーン
 let colorPickerEl = null;
 let currentRowIndexForColor = null; // どの行の色か（シート行番号）
 
@@ -360,8 +359,6 @@ function initColorPicker() {
 
     if (color === 'transparent') {
       swatch.classList.add('transparent');
-      swatch.style.background =
-        'repeating-linear-gradient(45deg,#f5f5f5,#f5f5f5 4px,#ddd 4px,#ddd 8px)';
       swatch.title = '無色';
     } else {
       swatch.style.backgroundColor = color;
@@ -497,9 +494,9 @@ function initStatusPicker() {
 function updateRowStatusBackground(tr, status) {
   if (!tr) return;
   if (status === "C/I") {
-    tr.style.backgroundColor = CI_ROW_BG; // 薄いグリーン
+    tr.classList.add('status-ci');
   } else {
-    tr.style.backgroundColor = "";        // 元に戻す
+    tr.classList.remove('status-ci');
   }
 }
 
@@ -1214,7 +1211,7 @@ function initNoteEditor() {
     swatch.textContent =
       colorKey === 'black' ? '黒' :
         colorKey === 'red' ? '赤' : '青';
-    swatch.style.color = NOTE_COLOR_MAP[colorKey];
+    swatch.dataset.color = colorKey;
 
     radio.addEventListener('change', () => {
       if (radio.checked) {
@@ -1242,10 +1239,8 @@ function initNoteEditor() {
     if (currentNoteCell && currentNoteRowIndex != null) {
       // 改行を反映して表示
       currentNoteCell.innerHTML = escapeHtml(val).replace(/\n/g, '<br>');
-      currentNoteCell.style.color =
-        NOTE_COLOR_MAP[currentNoteColor] || NOTE_COLOR_MAP.black;
 
-      // 次回参照用にデータ属性も更新
+      // 次回参照用＆CSS制御用にデータ属性も更新
       currentNoteCell.dataset.noteColor = currentNoteColor;
 
       // テキストと色を Y列に JSON 文字列として保存
@@ -2018,9 +2013,22 @@ function renderTable(
   // header
   const thead = document.createElement("thead");
   const trh = document.createElement("tr");
-  matrix[0].forEach(h => {
+  matrix[0].forEach((h, cIndex) => {
     const th = document.createElement("th");
     th.textContent = h;
+
+    th.classList.add('col-' + cIndex);
+    if (cIndex === 0) th.classList.add("col-status");
+    else if (h === "No") th.classList.add("col-no");
+    else if (h === "氏名") th.classList.add("col-name");
+    else if (["男", "女", "子供", "幼児"].includes(h)) th.classList.add("col-guest");
+    else if (h === "商品名") th.classList.add("col-product");
+    else if (h === "夕食") th.classList.add("col-dinner");
+    else if (h === "客室係") th.classList.add("col-staff");
+    else if (h === "夕食時間") th.classList.add("col-dinner-time");
+    else if (h === "朝食時間") th.classList.add("col-breakfast-time");
+    else if (h === "車") th.classList.add("col-car");
+
     trh.appendChild(th);
   });
   thead.appendChild(trh);
@@ -2077,10 +2085,23 @@ function renderTable(
       const td = document.createElement("td");
       td.innerHTML = escapeHtml(String(cell ?? '')).replace(/\n/g, "<br>");
 
+      td.classList.add('col-' + cIndex);
+      const h = header[cIndex];
+      if (cIndex === 0) td.classList.add("col-status");
+      else if (h === "No") td.classList.add("col-no");
+      else if (h === "氏名") td.classList.add("col-name");
+      else if (["男", "女", "子供", "幼児"].includes(h)) td.classList.add("col-guest");
+      else if (h === "商品名") td.classList.add("col-product");
+      else if (h === "夕食") td.classList.add("col-dinner");
+      else if (h === "客室係") td.classList.add("col-staff");
+      else if (h === "夕食時間") td.classList.add("col-dinner-time");
+      else if (h === "朝食時間") td.classList.add("col-breakfast-time");
+      else if (h === "車") td.classList.add("col-car");
+
       // 1列目（ステータス）
       if (cIndex === 0) {
         td.textContent = rowStatus || "";
-        td.style.cursor = 'pointer';
+        td.classList.add('clickable-cell');
         td.addEventListener('click', (event) => {
           event.stopPropagation();
           showStatusPicker(td, sheetRowIndex);
@@ -2091,7 +2112,7 @@ function renderTable(
       if (cIndex === nameColIndex) {
         const rawName = String(cell ?? '').trim();   // 元データの生文字
         if (rawName !== '') {                        // 空白チェック
-          td.innerHTML += '<span style="font-size:0.6em;font-weight:400;"> 様</span>';
+          td.innerHTML += '<span class="name-suffix"> 様</span>';
         }
       }
 
@@ -2118,7 +2139,7 @@ function renderTable(
         (infantColIndex !== -1 && cIndex === infantColIndex);
 
       if (isGuestCol) {
-        td.style.cursor = 'pointer';
+        td.classList.add('clickable-cell');
         td.addEventListener('click', (event) => {
           event.stopPropagation();
           showGuestModal(
@@ -2152,7 +2173,7 @@ function renderTable(
       // 夕食
       if (cIndex === dinnerColIndex) {
         td.textContent = rowDinner || "";
-        td.style.cursor = 'pointer';
+        td.classList.add('clickable-cell');
         td.addEventListener('click', (event) => {
           event.stopPropagation();
           showDinnerPicker(td, sheetRowIndex, rowDinner);
@@ -2162,7 +2183,7 @@ function renderTable(
       // 朝食
       if (cIndex === breakfastColIndex) {
         td.textContent = rowBreakfast || "";
-        td.style.cursor = 'pointer';
+        td.classList.add('clickable-cell');
         td.addEventListener('click', (event) => {
           event.stopPropagation();
           showBreakfastPicker(td, sheetRowIndex, rowBreakfast);
@@ -2173,9 +2194,7 @@ function renderTable(
       if (cIndex === noteColIndex) {
         td.innerHTML = escapeHtml(String(rowNoteText || '')).replace(/\n/g, "<br>");
 
-        td.style.cursor = 'pointer';
-        td.style.color =
-          NOTE_COLOR_MAP[rowNoteColor] || NOTE_COLOR_MAP.black;
+        td.classList.add('clickable-cell');
 
         td.dataset.noteColor = rowNoteColor || 'black';
 
@@ -2190,7 +2209,7 @@ function renderTable(
       // 客室係
       if (cIndex === staffColIndex) {
         td.textContent = rowStaff || "";
-        td.style.cursor = 'pointer';
+        td.classList.add('clickable-cell');
         td.addEventListener('click', (event) => {
           event.stopPropagation();
           showStaffPicker(td, sheetRowIndex, rowStaff);
@@ -2200,7 +2219,7 @@ function renderTable(
       // 車（P列）
       if (carColIndex !== -1 && cIndex === carColIndex) {
         td.textContent = String(cell ?? '');
-        td.style.cursor = 'pointer';
+        td.classList.add('clickable-cell');
         td.addEventListener('click', (event) => {
           event.stopPropagation();
           showCarPicker(td, sheetRowIndex);
@@ -2307,9 +2326,9 @@ function applyCleaningStatus(data) {
     const cellNo = tds[1].textContent.trim();
 
     if (cleanedRooms.has(cellNo)) {
-      // 一致したら 1列目 の背景を変更
-      if (tds[0]) {
-        tds[0].classList.add('cleanup');
+      // 一致したら 2列目 (No) にクラスを付与
+      if (tds[1]) {
+        tds[1].classList.add('cleanup');
       }
     }
   });
