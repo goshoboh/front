@@ -120,8 +120,10 @@ const fixture = {
   pending.shift()({ json: fixture });
   await finished();
   await page.clock.fastForward(60000);
-  await isLoading();
+  await page.waitForFunction(() => refreshingInBackground);
+  assert.equal(await loader.isVisible(), false, 'periodic refresh has no spinner');
   pending.shift()({ json: fixture });
+  await page.waitForFunction(() => !refreshingInBackground);
   await finished();
 
   await page.setViewportSize({ width: 390, height: 844 });

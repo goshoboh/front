@@ -11,6 +11,11 @@ let authKey = localStorage.getItem(LOCAL_STORAGE_AUTH_KEY) || null;
 let currentDate = new Date();  // ヘッダーの日付（表示・シート両方の基準）
 let currentSheetId = "";       // "YYYYMMDD" 形式
 
+// 最後に取得できた清掃情報を、同じ日付のテーブルの再描画にも引き継ぐ。
+let cleaningStatusSheetId = '';
+let cleanedRoomNumbers = new Set();
+let cleaningRequestId = 0;
+
 function dateToSheetId(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -26,10 +31,10 @@ function formatHeaderDate(date) {
 }
 
 
-function loadForCurrentDate() {
+function loadForCurrentDate(options = {}) {
   currentSheetId = dateToSheetId(currentDate); // "YYYYMMDD"
   renderCurrentDateHeader();
-  fetchAndRender(currentSheetId);
+  return fetchAndRender(currentSheetId, options);
 }
 
 // ==== 部屋移動モーダル用 ====
@@ -1529,13 +1534,17 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==== 60秒ごとに自動リロード ====
-setInterval(() => {
-  // ★ ピッカーが開いているときは更新しない
-  if (isAnyPickerOpen()) {
+setInterval(async () => {
+  // 編集中・読み込み中は定期更新を重ねない。
+  if (isAnyPickerOpen() || pendingLoads > 0 || refreshingInBackground) {
     return;
   }
-  // ★ 読み込み
-  loadForCurrentDate();
+  refreshingInBackground = true;
+  try {
+    await loadForCurrentDate({ background: true });
+  } finally {
+    refreshingInBackground = false;
+  }
 }, 60000);
 
 
@@ -1593,6 +1602,7 @@ const tableContainer = document.getElementById('tableContainer');
 const loadingIndicator = document.getElementById('loadingIndicator');
 const appMain = document.querySelector('main');
 let pendingLoads = 0;
+let refreshingInBackground = false;
 
 function setLoadingState(isLoading) {
   pendingLoads += isLoading ? 1 : -1;
@@ -1612,8 +1622,8 @@ loadButton.addEventListener('click', () => {
 // =======================
 // データ取得 + 加工 + 表示
 // =======================
-async function fetchAndRender(sheetId) {
-  setLoadingState(true);
+async function fetchAndRender(sheetId, { background = false } = {}) {
+  if (!background) setLoadingState(true);
   statusSpan.textContent = '';
   statusSpan.style.display = 'none';
   const targetSheetId = sheetId || currentSheetId || dateToSheetId(currentDate);
@@ -1633,7 +1643,7 @@ async function fetchAndRender(sheetId) {
     statusSpan.textContent = 'エラー: ' + e.message;
     statusSpan.style.display = 'inline';
   } finally {
-    setLoadingState(false);
+    if (!background) setLoadingState(false);
   }
 }
 
@@ -1698,6 +1708,7 @@ async function authWithKeywordAndFetch(sheetId) {
     const url = `${GAS_API_URL}?date=${encodeURIComponent(sheetId)}&keyword=${encodeURIComponent(keyword.trim())}`;
     const res = await fetch(url);
     const json = await res.json();
+    if (sheetId !== currentSheetId) return false;
 
     if (json.authorized === false) {
       // キーワード間違い
@@ -1718,7 +1729,7 @@ async function authWithKeywordAndFetch(sheetId) {
       statusSpan.textContent = '';
       statusSpan.style.display = 'none';
       // ★ 清掃状況を読み込んで反映
-      loadCleaningStatus().catch(err => console.error(err));
+      loadCleaningStatus(sheetId).catch(err => console.error(err));
     }
     // シートがない場合は handleFetchedData がメッセージを表示している
     return ok;
@@ -1739,6 +1750,7 @@ async function fetchWithKey(sheetId) {
     const url = `${GAS_API_URL}?date=${encodeURIComponent(sheetId)}&key=${encodeURIComponent(authKey)}`;
     const res = await fetch(url);
     const json = await res.json();
+    if (sheetId !== currentSheetId) return false;
 
     if (json.authorized === false) {
       // ★ キーが無効（GAS側の認証エラー）
@@ -1754,7 +1766,7 @@ async function fetchWithKey(sheetId) {
       statusSpan.textContent = '';
       statusSpan.style.display = 'none';
       // ★ 清掃状況を読み込んで反映
-      loadCleaningStatus().catch(err => console.error(err));
+      loadCleaningStatus(sheetId).catch(err => console.error(err));
     }
     // シートがないときは handleFetchedData がメッセージを出している
     return ok;
@@ -2125,6 +2137,11 @@ function renderTable(
   }
 
   table.appendChild(tbody);
+  // 新しいテーブルを画面に出す前に、前回の清掃チェックを復元する。
+  if (cleaningStatusSheetId === currentSheetId &&
+      currentSheetId === dateToSheetId(new Date())) {
+    renderCleaningStatus(table, cleanedRoomNumbers);
+  }
   tableContainer.innerHTML = "";
   tableContainer.appendChild(table);
 }
@@ -2146,12 +2163,13 @@ function escapeHtml(str) {
 // =======================
 // 清掃済み状況の読み込み
 // =======================
-async function loadCleaningStatus() {
+async function loadCleaningStatus(sheetId = currentSheetId) {
   // ★ 本日の日付のときのみ実行する
   const todayId = dateToSheetId(new Date());
-  if (currentSheetId !== todayId) {
+  if (sheetId !== todayId || sheetId !== currentSheetId) {
     return;
   }
+  const requestId = ++cleaningRequestId;
 
   try {
     // 清掃状況専用の GAS API に対して action: 'getCleaningStatus' を POST する
@@ -2165,8 +2183,10 @@ async function loadCleaningStatus() {
     });
 
     const json = await res.json();
+    if (sheetId !== currentSheetId || sheetId !== dateToSheetId(new Date()) ||
+        requestId !== cleaningRequestId) return;
     if (json.success && Array.isArray(json.data)) {
-      applyCleaningStatus(json.data);
+      applyCleaningStatus(json.data, sheetId);
     } else {
       console.warn('清掃状況の取得に失敗、またはデータ形式が不正です', json);
     }
@@ -2179,7 +2199,7 @@ async function loadCleaningStatus() {
 // =======================
 // 清掃状況をテーブルに反映
 // =======================
-function applyCleaningStatus(data) {
+function applyCleaningStatus(data, sheetId = currentSheetId) {
   // data: [[RoomNo, Flag1, Flag2, Flag3], ...] の配列 (C2:F18)
   // Flag1~3 (D,E,F列) がすべて TRUE なら「清掃済み」
 
@@ -2201,27 +2221,18 @@ function applyCleaningStatus(data) {
     }
   });
 
-  // 2. HTML上のテーブル行を探して反映
-  // テーブルの構造: 1列目=ステータス(index 0), 2列目=No(index 1) ※通常設定の場合
-  // renderTable で noColIndex を特定しているが、ここでは DOM から推定する
+  cleaningStatusSheetId = sheetId;
+  cleanedRoomNumbers = cleanedRooms;
+  const table = tableContainer.querySelector('table');
+  if (table) renderCleaningStatus(table, cleanedRoomNumbers);
+}
 
-  const tbody = document.querySelector('#tableContainer table tbody');
-  if (!tbody) return;
-
-  const trs = tbody.querySelectorAll('tr');
-  trs.forEach(tr => {
-    const tds = tr.querySelectorAll('td');
-    if (tds.length < 2) return;
-
-    // 2列目 (index 1) のテキストを部屋番号として判定
-    const cellNo = tds[1].textContent.trim();
-
-    if (cleanedRooms.has(cellNo)) {
-      // 一致したら 2列目 (No) にクラスを付与
-      if (tds[1]) {
-        tds[1].classList.add('cleanup');
-      }
-    }
+function renderCleaningStatus(table, cleanedRooms) {
+  table.querySelectorAll('tbody tr').forEach(tr => {
+    const cellNo = tr.cells[1];
+    if (!cellNo) return;
+    // 完了・未完了の両方を反映し、解除されたチェックも消す。
+    cellNo.classList.toggle('cleanup', cleanedRooms.has(cellNo.textContent.trim()));
   });
 }
 
