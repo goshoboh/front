@@ -1,14 +1,21 @@
-// sw.js
-self.addEventListener("install", (event) => {
-  // 必要ならここでキャッシュとか
-  console.log("Service Worker: install");
+// オンライン用。アプリ本体を古いキャッシュに固定しない。
+self.addEventListener('install', (event) => {
+  event.waitUntil(self.skipWaiting());
 });
 
-self.addEventListener("activate", (event) => {
-  console.log("Service Worker: activate");
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener("fetch", (event) => {
-  // ここでキャッシュ制御すればオフライン対応もできる
-  // 今は素通り
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  const scope = new URL(self.registration.scope);
+  const isAppFile = event.request.mode === 'navigate' ||
+    /\.(html|js|css|json|webmanifest|png|ico)$/.test(url.pathname);
+
+  // 外部の GAS 通信や書き込みリクエストには介入しない。
+  if (event.request.method !== 'GET' || url.origin !== scope.origin ||
+      !url.pathname.startsWith(scope.pathname) || !isAppFile) return;
+
+  event.respondWith(fetch(new Request(event.request, { cache: 'no-store' })));
 });

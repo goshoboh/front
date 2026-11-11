@@ -48,53 +48,33 @@ function initRoomMoveModal() {
   // オーバーレイ
   roomMoveModalEl = document.createElement('div');
   roomMoveModalEl.id = 'roomMoveModal';
-  roomMoveModalEl.style.position = 'fixed';
-  roomMoveModalEl.style.inset = '0';
-  roomMoveModalEl.style.background = 'rgba(0,0,0,0.4)';
   roomMoveModalEl.style.display = 'none';
-  roomMoveModalEl.style.zIndex = '9999';
-  roomMoveModalEl.style.alignItems = 'center';
-  roomMoveModalEl.style.justifyContent = 'center';
 
   // コンテンツ
   const content = document.createElement('div');
-  content.style.background = '#fff';
-  content.style.borderRadius = '8px';
-  content.style.padding = '30px';
-  content.style.minWidth = '320px';
-  content.style.maxHeight = '80vh';
-  content.style.display = 'flex';
-  content.style.flexDirection = 'column';
-  content.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+  content.classList.add('room-move-dialog');
 
   const title = document.createElement('div');
   title.textContent = '部屋移動';
-  title.style.fontWeight = 'bold';
-  title.style.fontSize = '1.4rem';
-  title.style.marginBottom = '8px';
+  title.classList.add('room-move-title');
   content.appendChild(title);
 
   const desc = document.createElement('div');
   desc.textContent = '入れ替えたい部屋を2つ選択してください。';
-  desc.style.fontSize = '0.85rem';
-  desc.style.marginBottom = '8px';
+  desc.classList.add('room-move-description');
   content.appendChild(desc);
 
   // 簡易テーブル（No & 氏名）
   const tableWrapper = document.createElement('div');
-  tableWrapper.style.flex = '1';
-  tableWrapper.style.overflowY = 'auto';
-  tableWrapper.style.marginBottom = '8px';
+  tableWrapper.classList.add('room-move-table-wrapper');
 
   const table = document.createElement('table');
-  table.style.width = '100%';
-  table.style.minWidth = '400px';
-  table.style.borderCollapse = 'collapse';
+  table.classList.add('room-move-table');
   table.innerHTML = `
     <thead>
       <tr>
-        <th style="border-bottom:1px solid #ccc; padding:4px;">No</th>
-        <th style="border-bottom:1px solid #ccc; padding:4px;">氏名</th>
+        <th class="room-move-column-heading">No</th>
+        <th class="room-move-column-heading">氏名</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -106,16 +86,12 @@ function initRoomMoveModal() {
 
   // ステータス表示
   roomMoveStatusEl = document.createElement('div');
-  roomMoveStatusEl.style.minHeight = '1.2em';
-  roomMoveStatusEl.style.fontSize = '0.85rem';
-  roomMoveStatusEl.style.marginBottom = '8px';
+  roomMoveStatusEl.classList.add('room-move-status');
   content.appendChild(roomMoveStatusEl);
 
   // ボタン行
   const buttonRow = document.createElement('div');
-  buttonRow.style.display = 'flex';
-  buttonRow.style.flexDirection = 'column';
-  buttonRow.style.gap = '10px';
+  buttonRow.classList.add('room-move-buttons');
 
 
   roomMoveExecButton = document.createElement('button');
@@ -185,13 +161,11 @@ function openRoomMoveModal() {
 
     const tdNo = document.createElement('td');
     tdNo.textContent = noText;
-    tdNo.style.padding = '4px';
-    tdNo.style.borderBottom = '1px solid #eee';
+    tdNo.classList.add('room-move-cell');
 
     const tdName = document.createElement('td');
     tdName.textContent = nameText;
-    tdName.style.padding = '4px';
-    tdName.style.borderBottom = '1px solid #eee';
+    tdName.classList.add('room-move-cell');
 
     modalTr.appendChild(tdNo);
     modalTr.appendChild(tdName);
@@ -338,24 +312,12 @@ function initColorPicker() {
 
   colorPickerEl = document.createElement('div');
   colorPickerEl.className = 'color-picker pickwindow';
-  colorPickerEl.style.position = 'absolute';
   colorPickerEl.style.display = 'none';
-  colorPickerEl.style.background = '#fff';
-  colorPickerEl.style.padding = '6px';
-  colorPickerEl.style.borderRadius = '6px';
-  colorPickerEl.style.zIndex = '9999';
   colorPickerEl.style.display = 'flex';
-  colorPickerEl.style.flexWrap = 'wrap';
 
   COLOR_OPTIONS.forEach(color => {
     const swatch = document.createElement('div');
     swatch.className = 'color-swatch';
-    swatch.style.width = '20px';
-    swatch.style.height = '20px';
-    swatch.style.borderRadius = '4px';
-    swatch.style.border = '1px solid #ccc';
-    swatch.style.cursor = 'pointer';
-    swatch.style.margin = '2px';
 
     if (color === 'transparent') {
       swatch.classList.add('transparent');
@@ -451,19 +413,12 @@ function initStatusPicker() {
 
   statusPickerEl = document.createElement('div');
   statusPickerEl.className = 'status-picker pickwindow';
-  statusPickerEl.style.position = 'absolute';
   statusPickerEl.style.display = 'none';
-  statusPickerEl.style.background = '#fff';
-  statusPickerEl.style.padding = '6px';
-  statusPickerEl.style.borderRadius = '6px';
-  statusPickerEl.style.zIndex = '9999';
-  statusPickerEl.style.fontSize = '1.3rem';
 
   STATUS_OPTIONS.forEach(st => {
     const btn = document.createElement('div');
     btn.textContent = st === "" ? "(空白)" : st;
-    btn.style.padding = '8px 8px';
-    btn.style.cursor = 'pointer';
+    btn.classList.add('status-option');
 
     btn.addEventListener('click', () => {
       if (currentStatusTarget) {
@@ -850,32 +805,20 @@ function initDinnerPicker() {
 
   dinnerPickerEl = document.createElement('div');
   dinnerPickerEl.className = 'dinner-picker pickwindow';
-  dinnerPickerEl.style.position = 'absolute';
   dinnerPickerEl.style.display = 'none';
-  dinnerPickerEl.style.background = '#fff';
-  dinnerPickerEl.style.padding = '10px';
-  dinnerPickerEl.style.borderRadius = '6px';
-  dinnerPickerEl.style.zIndex = '9999';
 
   dinnerCountSpans = {}; // 件数表示用
 
   DINNER_OPTIONS.forEach(t => {
     const line = document.createElement('div');
-    line.style.display = 'flex';
-    line.style.alignItems = 'center';
-    line.style.gap = '10px';
-    line.style.padding = '2px 0';
+    line.classList.add('dinner-option-row');
 
     const btn = document.createElement('div');
     btn.textContent = t === "" ? "(空白)" : t;
-    btn.style.fontSize = '1.4rem';
-    btn.style.padding = '4px 8px';
-    btn.style.cursor = 'pointer';
-    btn.style.flex = '0 0 auto';
+    btn.classList.add('dinner-option');
 
     const countSpan = document.createElement('span');
-    countSpan.style.fontSize = '1rem';
-    countSpan.style.color = '#555';
+    countSpan.classList.add('dinner-option-count');
     countSpan.textContent = '';
 
     dinnerCountSpans[t] = countSpan;
@@ -898,15 +841,11 @@ function initDinnerPicker() {
   const input = document.createElement('input');
   input.type = 'text';
   input.placeholder = 'その他の時間...';
-  input.style.marginTop = '10px';
-  input.style.width = '100%';
-  input.style.padding = '8px';
+  input.classList.add('meal-time-input');
 
   const okBtn = document.createElement('button');
   okBtn.textContent = 'OK';
-  okBtn.style.marginTop = '10px';
-  okBtn.style.width = '100%';
-  okBtn.style.padding = '8px';
+  okBtn.classList.add('meal-time-confirm');
 
   okBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -1021,19 +960,12 @@ function initBreakfastPicker() {
 
   breakfastPickerEl = document.createElement('div');
   breakfastPickerEl.className = 'breakfast-picker pickwindow';
-  breakfastPickerEl.style.position = 'absolute';
   breakfastPickerEl.style.display = 'none';
-  breakfastPickerEl.style.background = '#fff';
-  breakfastPickerEl.style.padding = '10px';
-  breakfastPickerEl.style.borderRadius = '6px';
-  breakfastPickerEl.style.zIndex = '9999';
 
   BREAKFAST_OPTIONS.forEach(t => {
     const btn = document.createElement('div');
     btn.textContent = t === "" ? "(空白)" : t;
-    btn.style.padding = '4px 8px';
-    btn.style.fontSize = '1.4rem';
-    btn.style.cursor = 'pointer';
+    btn.classList.add('breakfast-option');
 
     btn.addEventListener('click', () => {
       if (currentBreakfastCell && currentBreakfastRowIndex != null) {
@@ -1050,15 +982,11 @@ function initBreakfastPicker() {
   const input = document.createElement('input');
   input.type = 'text';
   input.placeholder = 'その他...';
-  input.style.marginTop = '10px';
-  input.style.width = '100%';
-  input.style.padding = '8px';
+  input.classList.add('meal-time-input');
 
   const okBtn = document.createElement('button');
   okBtn.textContent = 'OK';
-  okBtn.style.marginTop = '10px';
-  okBtn.style.padding = '8px';
-  okBtn.style.width = '100%';
+  okBtn.classList.add('meal-time-confirm');
 
   okBtn.addEventListener('click', () => {
     const val = input.value.trim();
@@ -1169,31 +1097,21 @@ function initNoteEditor() {
 
   noteEditorEl = document.createElement('div');
   noteEditorEl.className = 'note-editor pickwindow';
-  noteEditorEl.style.position = 'absolute';
   noteEditorEl.style.display = 'none';
-  noteEditorEl.style.background = '#fff';
-  noteEditorEl.style.padding = '10px';
-  noteEditorEl.style.borderRadius = '6px';
-  noteEditorEl.style.zIndex = '9999';
-  noteEditorEl.style.width = '300px';
   noteEditorEl.id = 'Notetxt';
 
   // テキストエリア
   noteTextarea = document.createElement('textarea');
   noteTextarea.rows = 4;
-  noteTextarea.style.width = '100%';
-  noteTextarea.style.fontSize = '20px';
+  noteTextarea.classList.add('note-textarea');
 
   // 色選択（黒・赤・青のラジオボタン）
   const colorWrapper = document.createElement('div');
-  colorWrapper.style.display = 'flex';
-  colorWrapper.style.gap = '8px';
-  colorWrapper.style.marginTop = '4px';
-  colorWrapper.style.alignItems = 'center';
+  colorWrapper.classList.add('note-color-controls');
 
   const labelTitle = document.createElement('span');
   labelTitle.textContent = '文字色:';
-  labelTitle.style.fontSize = '1rem';
+  labelTitle.classList.add('note-color-title');
   colorWrapper.appendChild(labelTitle);
 
   noteColorRadioMap = {};
@@ -1230,9 +1148,7 @@ function initNoteEditor() {
   // OK ボタン
   const okBtn = document.createElement('button');
   okBtn.textContent = 'OK';
-  okBtn.style.marginTop = '10px';
-  okBtn.style.padding = '10px';
-  okBtn.style.width = '100%';
+  okBtn.classList.add('note-confirm');
 
   okBtn.addEventListener('click', () => {
     const val = noteTextarea.value.trim();
@@ -1328,15 +1244,7 @@ function initStaffPicker() {
 
   staffPickerEl = document.createElement('div');
   staffPickerEl.className = 'staff-picker pickwindow';
-  staffPickerEl.style.position = 'absolute';
   staffPickerEl.style.display = 'none';
-  staffPickerEl.style.background = '#fff';
-  staffPickerEl.style.padding = '6px';
-  staffPickerEl.style.borderRadius = '6px';
-  staffPickerEl.style.zIndex = '9999';
-  staffPickerEl.style.maxHeight = '240px';
-  staffPickerEl.style.overflowY = 'auto';
-  staffPickerEl.style.minWidth = '120px';
 
   document.body.appendChild(staffPickerEl);
 }
@@ -1355,9 +1263,7 @@ function showStaffPicker(cell, rowIndex, currentValue) {
   // ★ (空白) ボタンを追加
   const blankBtn = document.createElement('div');
   blankBtn.textContent = '(空白)';
-  blankBtn.style.padding = '10px 8px';
-  blankBtn.style.cursor = 'pointer';
-  blankBtn.style.borderBottom = '1px solid #eee'; // 区切り線
+  blankBtn.classList.add('staff-blank-option');
   blankBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     if (currentStaffCell && currentStaffRowIndex != null) {
@@ -1371,14 +1277,13 @@ function showStaffPicker(cell, rowIndex, currentValue) {
   if (!staffOptions || staffOptions.length === 0) {
     const msg = document.createElement('div');
     msg.textContent = "客室係リストがありません";
-    msg.style.fontSize = '1rem';
+    msg.classList.add('staff-empty-message');
     staffPickerEl.appendChild(msg);
   } else {
     staffOptions.forEach(name => {
       const btn = document.createElement('div');
       btn.textContent = name;
-      btn.style.padding = '10px 8px';
-      btn.style.cursor = 'pointer';
+      btn.classList.add('staff-option');
       if (name === currentValue) {
         btn.style.fontWeight = 'bold';
       }
@@ -1427,23 +1332,11 @@ function initCarPicker() {
   carPickerEl.id = 'carPicker';
   carPickerEl.className = 'picker';
   carPickerEl.style.display = 'none';
-  carPickerEl.style.position = 'absolute';
-  carPickerEl.style.zIndex = '9999';
-  carPickerEl.style.background = '#fff';
-  carPickerEl.style.border = '1px solid #ccc';
-  carPickerEl.style.borderRadius = '8px';
-  carPickerEl.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-  carPickerEl.style.padding = '8px';
-  carPickerEl.style.minWidth = '160px';
 
   // タイトル（No表示用：他ピッカーと同じ要領）
   const title = document.createElement('div');
   title.className = 'picker-title';
-  title.style.fontWeight = 'bold';
-  title.style.padding = '6px 8px';
-  title.style.margin = '-8px -8px 8px -8px';
-  title.style.borderBottom = '1px solid #ddd';
-  title.style.background = '#f7f7f7';
+  title.classList.add('car-picker-title');
   carPickerEl.appendChild(title);
 
   const options = ['車', '電車', '阪急バス', '太閤橋', 'ロープウェー', '']; // 空白も入れる（クリア用）
@@ -1451,9 +1344,7 @@ function initCarPicker() {
   options.forEach(v => {
     const btn = document.createElement('div');
     btn.textContent = v === '' ? '（空白）' : v;
-    btn.style.padding = '6px 8px';
-    btn.style.cursor = 'pointer';
-    btn.style.borderRadius = '6px';
+    btn.classList.add('car-option');
 
     btn.addEventListener('mouseenter', () => btn.style.background = '#f2f2f2');
     btn.addEventListener('mouseleave', () => btn.style.background = 'transparent');
@@ -1595,7 +1486,6 @@ function initDateNavigation() {
   const dateInput = document.createElement('input');
   dateInput.type = 'date';
   dateInput.id = 'dateInput';
-  dateInput.style.margin = '0 4px';
 
   // 日付が変更されたら、その日付のシートを読み込む
   dateInput.addEventListener('change', () => {
@@ -1676,10 +1566,6 @@ function initPickerOverlay() {
 
   pickerOverlayEl = document.createElement('div');
   pickerOverlayEl.id = 'pickerOverlay';
-  pickerOverlayEl.style.position = 'fixed';
-  pickerOverlayEl.style.inset = '0';
-  pickerOverlayEl.style.background = 'transparent';
-  pickerOverlayEl.style.zIndex = '9000';
   pickerOverlayEl.style.display = 'none';
 
   // ★ ウィンドウ外タップで「保存せずに閉じる」(= closeAllPickers)
