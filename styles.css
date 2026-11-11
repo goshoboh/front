@@ -763,3 +763,42 @@ td.no-cell {
   font: inherit;
   cursor: pointer;
 }
+
+/* SVG は画像ファイルのまま読み込み、画像だけを回転させる。 */
+.loading-indicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 8000;
+  display: grid;
+  place-items: center;
+  width: 104px;
+  height: 104px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+}
+
+.loading-indicator[hidden] {
+  display: none;
+}
+
+.loading-indicator img {
+  display: block;
+  object-fit: contain;
+  animation: loading-spin 1.4s linear infinite;
+}
+
+@keyframes loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-indicator img {
+    animation: none;
+  }
+}

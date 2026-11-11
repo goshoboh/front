@@ -239,8 +239,6 @@ async function executeRoomMove() {
     closeRoomMoveModal();
     // 再読み込み
     tableContainer.innerHTML = '';
-    statusSpan.textContent = '読み込み中…';
-    statusSpan.style.display = 'inline';
     loadForCurrentDate();
 
   } catch (e) {
@@ -1495,8 +1493,6 @@ function initDateNavigation() {
     currentDate = new Date(y, m - 1, d);
 
     tableContainer.innerHTML = '';
-    statusSpan.textContent = '読み込み中…';
-    statusSpan.style.display = 'inline';
     loadForCurrentDate();
   });
 
@@ -1520,8 +1516,6 @@ function changeCurrentDateByDays(delta) {
   currentDate.setDate(currentDate.getDate() + delta);
 
   tableContainer.innerHTML = '';
-  statusSpan.textContent = '読み込み中…';
-  statusSpan.style.display = 'inline';
   loadForCurrentDate();
 }
 
@@ -1531,8 +1525,6 @@ window.addEventListener('DOMContentLoaded', () => {
   initDateNavigation();       // ヘッダーに type=date＋ボタンをセット
   initPickerCloseGuard();
 
-  statusSpan.textContent = '読み込み中…';
-  statusSpan.style.display = 'inline';
   loadForCurrentDate();       //  自動で今日のシートを読み込む
 });
 
@@ -1598,13 +1590,21 @@ function hidePickerOverlay() {
 const loadButton = document.getElementById('loadButton');
 const statusSpan = document.getElementById('status');
 const tableContainer = document.getElementById('tableContainer');
+const loadingIndicator = document.getElementById('loadingIndicator');
+const appMain = document.querySelector('main');
+let pendingLoads = 0;
+
+function setLoadingState(isLoading) {
+  pendingLoads += isLoading ? 1 : -1;
+  const busy = pendingLoads > 0;
+  loadingIndicator.hidden = !busy;
+  appMain.setAttribute('aria-busy', String(busy));
+}
 
 // =======================
 // ボタン押下イベント
 // =======================
 loadButton.addEventListener('click', () => {
-  statusSpan.textContent = '読み込み中…';
-  statusSpan.style.display = 'inline';
   loadForCurrentDate();
 });
 
@@ -1613,6 +1613,9 @@ loadButton.addEventListener('click', () => {
 // データ取得 + 加工 + 表示
 // =======================
 async function fetchAndRender(sheetId) {
+  setLoadingState(true);
+  statusSpan.textContent = '';
+  statusSpan.style.display = 'none';
   const targetSheetId = sheetId || currentSheetId || dateToSheetId(currentDate);
 
   try {
@@ -1629,6 +1632,8 @@ async function fetchAndRender(sheetId) {
     console.error(e);
     statusSpan.textContent = 'エラー: ' + e.message;
     statusSpan.style.display = 'inline';
+  } finally {
+    setLoadingState(false);
   }
 }
 

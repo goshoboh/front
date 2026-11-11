@@ -23,7 +23,7 @@ const server = http.createServer((req,res) => {
   if(file==='version.json'&&versionUnavailable){res.writeHead(503);res.end();return}
   try {
     const body=legacyWorker&&file==='sw.js' ? 'self.addEventListener("fetch", () => {});' : fs.readFileSync(path.join(root,file));
-    const type={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json'}[path.extname(file)]||'application/octet-stream';
+    const type={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.svg':'image/svg+xml'}[path.extname(file)]||'application/octet-stream';
     res.writeHead(200,{'Content-Type':type,'Cache-Control':'public, max-age=31536000'});res.end(body);
   } catch {res.writeHead(404);res.end()}
 });

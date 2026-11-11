@@ -11,7 +11,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   const scope = new URL(self.registration.scope);
   const isAppFile = event.request.mode === 'navigate' ||
-    /\.(html|js|css|json|webmanifest|png|ico)$/.test(url.pathname);
+    /\.(html|js|css|json|webmanifest|png|ico|svg)$/.test(url.pathname);
 
   // 外部の GAS 通信や書き込みリクエストには介入しない。
   if (event.request.method !== 'GET' || url.origin !== scope.origin ||

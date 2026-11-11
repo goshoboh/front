@@ -40,6 +40,7 @@ Playwright と Chromium が利用できる開発環境で実行します（ア�
 
 ```sh
 node tests/pwa-update.cjs
+node tests/loading.cjs
 ```
 
 既存の Playwright や Chromium を使う場合は、`PLAYWRIGHT_MODULE` にモジュールのパス、`CHROMIUM_PATH` に実行ファイルのパスを指定できます。

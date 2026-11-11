@@ -2,9 +2,10 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="app-version" content="4da36bb936dbb63fbe785177b49f715e3316b601a74d427c232c2ae233a52d66">
+  <meta name="app-version" content="7bfa3327784b19091611320286f23f052830f6e6783278a5019a18fbd1372c11">
   <title>フロント台帳</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="preload" as="image" href="icons/loading.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- PWA: manifest -->
@@ -53,6 +54,9 @@
   </header>
 
   <main>
+    <div id="loadingIndicator" class="loading-indicator" role="status" aria-label="読み込み中" hidden>
+      <img src="icons/loading.svg" width="72" height="72" alt="">
+    </div>
     <div id="status"></div>
     <div id="tableContainer" class="table-container"></div>
   </main>
