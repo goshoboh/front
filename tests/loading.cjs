@@ -79,6 +79,8 @@ const fixture = {
   assert.equal(box.x + box.width / 2, 512);
   assert.equal(box.y + box.height / 2, 384);
   assert.equal(await page.locator('#loadingIndicator img').getAttribute('src'), 'icons/loading.svg');
+  assert.equal(await loader.evaluate(element => getComputedStyle(element).backgroundColor), 'rgba(0, 0, 0, 0)');
+  assert.equal(await loader.evaluate(element => getComputedStyle(element).boxShadow), 'none');
   const transform = () => page.locator('#loadingIndicator img').evaluate(image => getComputedStyle(image).transform);
   const first = await transform();
   await page.waitForTimeout(120);

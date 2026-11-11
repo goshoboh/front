@@ -731,39 +731,6 @@ td.no-cell {
   padding: 4px;
 }
 
-/* アプリ更新の通知（台帳の入力中は自動で再読み込みしない） */
-.app-update {
-  position: fixed;
-  right: 12px;
-  bottom: 12px;
-  left: 12px;
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 16px;
-  color: #fff;
-  background: #164c7e;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
-}
-
-.app-update[hidden] {
-  display: none;
-}
-
-.app-update button {
-  flex-shrink: 0;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 4px;
-  color: #164c7e;
-  background: #fff;
-  font: inherit;
-  cursor: pointer;
-}
-
 /* SVG は画像ファイルのまま読み込み、画像だけを回転させる。 */
 .loading-indicator {
   position: fixed;
@@ -775,9 +742,6 @@ td.no-cell {
   width: 104px;
   height: 104px;
   transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   pointer-events: none;
 }
 
